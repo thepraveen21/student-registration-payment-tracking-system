@@ -6,15 +6,16 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\ReportController;
+use App\Http\Controllers\AdvancedReportController;
 use App\Http\Controllers\ReceptionController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\NotificationController;
 
 // Reception-specific controllers
 use App\Http\Controllers\Reception\ReceptionStudentController;
 use App\Http\Controllers\Reception\ReceptionPaymentController;
-use App\Http\Controllers\Reception\ReceptionInvoiceController;
-use App\Http\Controllers\Reception\ReceptionUserController;
+use App\Http\Controllers\ReceptionInvoiceController;
+// use App\Http\Controllers\Reception\ReceptionUserController;
 
 
 // ✅ Welcome Page
@@ -52,7 +53,27 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         'update' => 'admin.payments.update',
         'destroy' => 'admin.payments.destroy',
     ]);
-    Route::get('/admin/reports', [ReportController::class, 'index'])->name('admin.reports');
+    
+    // Reports
+    Route::get('/admin/reports', [AdvancedReportController::class, 'index'])->name('admin.reports.index');
+    Route::get('/admin/reports/course-wise-students', [AdvancedReportController::class, 'courseWiseStudents'])->name('admin.reports.course-wise-students');
+    Route::get('/admin/reports/payment-status', [AdvancedReportController::class, 'paymentStatus'])->name('admin.reports.payment-status');
+    Route::get('/admin/reports/overdue-cases', [AdvancedReportController::class, 'overdueCases'])->name('admin.reports.overdue-cases');
+    Route::get('/admin/reports/revenue', [AdvancedReportController::class, 'revenue'])->name('admin.reports.revenue');
+    Route::get('/admin/reports/enrollment-summary', [AdvancedReportController::class, 'enrollmentSummary'])->name('admin.reports.enrollment-summary');
+    Route::get('/admin/reports/notifications', [AdvancedReportController::class, 'notifications'])->name('admin.reports.notifications');
+
+    // Notification routes
+    Route::get('/admin/notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');
+    Route::get('/admin/notifications/create', [NotificationController::class, 'create'])->name('admin.notifications.create');
+    Route::post('/admin/notifications', [NotificationController::class, 'store'])->name('admin.notifications.store');
+    Route::post('/admin/notifications/send-overdue', [NotificationController::class, 'sendOverdueNotifications'])->name('admin.notifications.send-overdue');
+    Route::post('/admin/notifications/retry-failed', [NotificationController::class, 'retryFailed'])->name('admin.notifications.retry-failed');
+    Route::patch('/admin/notifications/{notification}/mark-read', [NotificationController::class, 'markAsRead'])->name('admin.notifications.mark-read');
+    Route::post('/admin/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('admin.notifications.mark-all-read');
+    Route::delete('/admin/notifications/{notification}', [NotificationController::class, 'destroy'])->name('admin.notifications.destroy');
+    Route::get('/admin/notifications/overdue-preview', [NotificationController::class, 'overduePreview'])->name('admin.notifications.overdue-preview');
+    
     Route::get('admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
     Route::post('admin/settings', [SettingController::class, 'update'])->name('admin.settings.update');
 });
@@ -78,7 +99,7 @@ Route::middleware(['auth', 'role:receptionist'])->prefix('reception')->name('rec
     Route::get('/settings', [ReceptionController::class, 'settings'])->name('settings');
 
     // User management (optional for reception)
-    Route::resource('users', ReceptionUserController::class);
+    // Route::resource('users', ReceptionUserController::class);
 });
 
 // ✅ Profile

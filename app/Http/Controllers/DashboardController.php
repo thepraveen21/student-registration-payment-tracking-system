@@ -35,7 +35,8 @@ class DashboardController extends Controller
                 return $students->count();
             });
 
-        $recentActivities = AuditLog::with('user')->latest()->take(5)->get();
+        $recentStudents = Student::with('course')->latest()->take(5)->get();
+        $recentPayments = Payment::with('student')->latest()->take(5)->get();
 
         return view('dashboard', compact(
             'totalStudents',
@@ -44,13 +45,48 @@ class DashboardController extends Controller
             'monthlyRevenue',
             'paymentChartData',
             'courseChartData',
-            'recentActivities'
+            'recentStudents',
+            'recentPayments'
         ));
     }
 
     // Reception Dashboard
     public function indexReception()
     {
-        return view('Reception'); // resources/views/Reception.blade.php
+        $totalStudents = Student::count();
+        $todaysRegistrations = Student::whereDate('created_at', now()->today())->count();
+        $pendingPayments = PaymentSchedule::where('status', 'pending')
+            ->orWhere('status', 'overdue')
+            ->count();
+        $overduePayments = PaymentSchedule::where('status', 'overdue')->count();
+        $todaysRevenue = Payment::whereDate('payment_date', now()->today())->sum('amount');
+        $yesterdaysRevenue = Payment::whereDate('payment_date', now()->yesterday())->sum('amount');
+        $weeklyNewStudents = Student::whereBetween('created_at', [
+            now()->startOfWeek(),
+            now()->endOfWeek()
+        ])->count();
+
+        $recentPayments = Payment::with('student')->latest()->take(5)->get();
+        $recentActivities = AuditLog::with('user')->latest()->take(4)->get();
+        $overduePaymentSchedules = PaymentSchedule::with('student')
+            ->where('status', 'overdue')
+            ->count();
+        $studentsNeedingVerification = Student::whereDoesntHave('payments')
+            ->whereBetween('created_at', [now()->subWeek(), now()])
+            ->count();
+
+        return view('Reception', compact(
+            'totalStudents',
+            'todaysRegistrations',
+            'pendingPayments',
+            'overduePayments',
+            'todaysRevenue',
+            'yesterdaysRevenue',
+            'weeklyNewStudents',
+            'recentPayments',
+            'recentActivities',
+            'overduePaymentSchedules',
+            'studentsNeedingVerification'
+        ));
     }
 }

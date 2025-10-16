@@ -65,50 +65,69 @@
         </div>
     </div>
 
-    <!-- Recent Activities -->
-    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <!-- Newly Added Students -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-8">
         <div class="px-6 py-4 border-b border-gray-100">
-            <h3 class="text-lg font-medium text-gray-800">Recent Activities</h3>
+            <h3 class="text-lg font-medium text-gray-800">Newly Added Students</h3>
         </div>
-
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead>
                     <tr class="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        <th class="px-6 py-3">Time</th>
-                        <th class="px-6 py-3">User</th>
-                        <th class="px-6 py-3">Action</th>
-                        <th class="px-6 py-3">Student</th>
-                        <th class="px-6 py-3">Status</th>
+                        <th class="px-6 py-3">Student Name</th>
+                        <th class="px-6 py-3">Course</th>
+                        <th class="px-6 py-3">Registered At</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
-                    @foreach ($recentActivities as $activity)
+                    @foreach ($recentStudents as $student)
                         <tr class="table-row">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ $activity->created_at->format('h:i A') }}</div>
-                                <div class="text-xs text-gray-500">{{ $activity->created_at->diffForHumans() }}</div>
+                                <div class="text-sm text-gray-900">{{ $student->name }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ $activity->user->name }}</div>
+                                <div class="text-sm text-gray-900">{{ $student->course->name }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ $activity->action }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">-</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Success</span>
+                                <div class="text-sm text-gray-900">{{ $student->created_at->format('Y-m-d') }}</div>
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
+    </div>
 
-        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
-            <a href="#" class="text-sm font-medium text-primary-600 hover:text-primary-500">View all activities</a>
+    <!-- Recent Payments -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100">
+            <h3 class="text-lg font-medium text-gray-800">Recent Payments</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th class="px-6 py-3">Student Name</th>
+                        <th class="px-6 py-3">Amount</th>
+                        <th class="px-6 py-3">Payment Date</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @foreach ($recentPayments as $payment)
+                        <tr class="table-row">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ $payment->student->name }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">${{ number_format($payment->amount, 2) }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ $payment->created_at->format('Y-m-d') }}</div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 @endsection

@@ -1,80 +1,85 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <h1 class="text-2xl font-bold text-gray-800 mb-6">Reports</h1>
+<div class="container mx-auto px-4 sm:px-8">
+    <div class="py-8">
+        <div class="mb-6">
+            <h2 class="text-2xl font-semibold leading-tight">Advanced Reports</h2>
+            <p class="text-gray-600">Generate detailed reports and analytics for your student management system.</p>
+        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Financial Reports -->
-            <div>
-                <h2 class="text-lg font-semibold text-gray-700 mb-4">Financial Reports</h2>
-                <div class="space-y-4">
-                    <a href="{{ route('admin.reports.financial.revenue') }}" class="report-link-card">
-                        <div class="flex items-center">
-                            <div class="mr-4">
-                                <i class="fas fa-chart-line text-blue-500 text-2xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-800">Revenue Reports</h3>
-                                <p class="text-sm text-gray-600">View monthly and annual revenue trends.</p>
-                            </div>
-                        </div>
-                    </a>
-                    <a href="{{ route('admin.reports.financial.payment_status') }}" class="report-link-card">
-                        <div class="flex items-center">
-                            <div class="mr-4">
-                                <i class="fas fa-tasks text-yellow-500 text-2xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-800">Payment Status Reports</h3>
-                                <p class="text-sm text-gray-600">Analyze payment statuses (paid, pending, overdue).</p>
-                            </div>
-                        </div>
-                    </a>
-                    <a href="{{ route('admin.reports.financial.payment_method') }}" class="report-link-card">
-                        <div class="flex items-center">
-                            <div class="mr-4">
-                                <i class="fas fa-credit-card text-green-500 text-2xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-800">Payment Method Analysis</h3>
-                                <p class="text-sm text-gray-600">Breakdown of payments by method.</p>
-                            </div>
-                        </div>
-                    </a>
+        <!-- Quick Statistics -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+            <div class="bg-blue-500 text-white rounded-lg p-6">
+                <div class="flex items-center">
+                    <i class="fas fa-users text-2xl mr-4"></i>
+                    <div>
+                        <h3 class="text-lg font-semibold">Total Students</h3>
+                        <p class="text-2xl font-bold">{{ number_format($stats['total_students']) }}</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Student Reports -->
-            <div>
-                <h2 class="text-lg font-semibold text-gray-700 mb-4">Student Reports</h2>
-                <div class="space-y-4">
-                    <a href="{{ route('admin.reports.student.enrollment_trends') }}" class="report-link-card">
-                        <div class="flex items-center">
-                            <div class="mr-4">
-                                <i class="fas fa-user-plus text-purple-500 text-2xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-800">Enrollment Trends</h3>
-                                <p class="text-sm text-gray-600">Track student enrollment over time.</p>
-                            </div>
-                        </div>
-                    </a>
-                    <a href="{{ route('admin.reports.student.course_enrollment') }}" class="report-link-card">
-                        <div class="flex items-center">
-                            <div class="mr-4">
-                                <i class="fas fa-book-reader text-indigo-500 text-2xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-800">Course Enrollment Statistics</h3>
-                                <p class="text-sm text-gray-600">See how many students are in each course.</p>
-                            </div>
-                        </div>
+            <div class="bg-green-500 text-white rounded-lg p-6">
+                <div class="flex items-center">
+                    <i class="fas fa-rupee-sign text-2xl mr-4"></i>
+                    <div>
+                        <h3 class="text-lg font-semibold">Total Revenue</h3>
+                        <p class="text-2xl font-bold">₹{{ number_format($stats['total_payments'], 2) }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-yellow-500 text-white rounded-lg p-6">
+                <div class="flex items-center">
+                    <i class="fas fa-clock text-2xl mr-4"></i>
+                    <div>
+                        <h3 class="text-lg font-semibold">Pending</h3>
+                        <p class="text-2xl font-bold">₹{{ number_format($stats['pending_payments'], 2) }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-red-500 text-white rounded-lg p-6">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-triangle text-2xl mr-4"></i>
+                    <div>
+                        <h3 class="text-lg font-semibold">Overdue</h3>
+                        <p class="text-2xl font-bold">₹{{ number_format($stats['overdue_payments'], 2) }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-purple-500 text-white rounded-lg p-6">
+                <div class="flex items-center">
+                    <i class="fas fa-book text-2xl mr-4"></i>
+                    <div>
+                        <h3 class="text-lg font-semibold">Total Courses</h3>
+                        <p class="text-2xl font-bold">{{ number_format($stats['total_courses']) }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Categories -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <!-- Course Reports -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-graduation-cap text-blue-500 text-2xl mr-3"></i>
+                    <h3 class="text-xl font-semibold">Course Reports</h3>
+                </div>
+                <p class="text-gray-600 mb-4">Analyze student enrollment and course performance.</p>
+                <div class="space-y-2">
+                    <a href="{{ route('admin.reports.course-wise-students') }}" class="block bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded transition duration-200">
+                        <i class="fas fa-chart-bar mr-2"></i>Course-wise Students
                     </a>
                 </div>
             </div>
         </div>
     </div>
+</div>
 @endsection
 
 @push('styles')

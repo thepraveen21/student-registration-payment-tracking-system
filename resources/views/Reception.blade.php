@@ -193,12 +193,6 @@
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a class="nav-link" href="{{ route('reception.users.index') }}">
-                            <i class="fas fa-fw fa-users me-2"></i>
-                            <span>User Management</span>
-                        </a>
-                    </div>
-                    <div class="nav-item">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <a href="#" class="nav-link" onclick="event.preventDefault(); this.closest('form').submit();">
@@ -208,3 +202,194 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-10 col-md-9">
+                <div class="content-header">
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Reception Dashboard</h1>
+                        <small class="text-muted">{{ now()->format('l, F j, Y - g:i A') }}</small>
+                    </div>
+                </div>
+
+                <!-- Dashboard Statistics Cards -->
+                <div class="row">
+                    <!-- Total Students -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stat-card primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Students</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ number_format($totalStudents) }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-user-graduate fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Today's Registrations -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stat-card success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Today's Registrations</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $todaysRegistrations }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-user-plus fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pending Payments -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stat-card warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Payments</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $pendingPayments }}</div>
+                                        @if($overduePayments > 0)
+                                            <div class="text-xs text-danger mt-1">{{ $overduePayments }} overdue</div>
+                                        @endif
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Today's Revenue -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stat-card danger shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Today's Revenue</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">${{ number_format($todaysRevenue, 2) }}</div>
+                                        @php
+                                            $revenueChange = $yesterdaysRevenue > 0 ? (($todaysRevenue - $yesterdaysRevenue) / $yesterdaysRevenue) * 100 : 0;
+                                        @endphp
+                                        @if($revenueChange > 0)
+                                            <div class="text-xs text-success mt-1">+{{ number_format($revenueChange, 1) }}% from yesterday</div>
+                                        @elseif($revenueChange < 0)
+                                            <div class="text-xs text-danger mt-1">{{ number_format($revenueChange, 1) }}% from yesterday</div>
+                                        @else
+                                            <div class="text-xs text-muted mt-1">Same as yesterday</div>
+                                        @endif
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Row -->
+                <div class="row">
+                    <!-- Recent Payments -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Recent Payments</h6>
+                            </div>
+                            <div class="card-body">
+                                @forelse($recentPayments as $payment)
+                                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                        <div>
+                                            <div class="font-weight-bold">{{ $payment->student->first_name }} {{ $payment->student->last_name }}</div>
+                                            <small class="text-muted">{{ $payment->payment_date->format('M j, Y') }}</small>
+                                        </div>
+                                        <span class="badge bg-success">${{ number_format($payment->amount, 2) }}</span>
+                                    </div>
+                                @empty
+                                    <p class="text-muted">No recent payments found.</p>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Recent Activity</h6>
+                            </div>
+                            <div class="card-body">
+                                @forelse($recentActivities as $activity)
+                                    <div class="d-flex align-items-center py-2 border-bottom">
+                                        <div class="me-3">
+                                            <i class="fas fa-{{ 
+                                                str_contains(strtolower($activity->action), 'student') ? 'user-plus text-success' : 
+                                                (str_contains(strtolower($activity->action), 'payment') ? 'credit-card text-primary' : 
+                                                'activity text-secondary')
+                                            }}"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="font-weight-bold">{{ $activity->action }}</div>
+                                            @if($activity->description)
+                                                <small class="text-muted">{{ Str::limit($activity->description, 50) }}</small>
+                                            @endif
+                                            <div class="text-xs text-muted">{{ $activity->created_at->diffForHumans() }}</div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <p class="text-muted">No recent activities found.</p>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="row">
+                    <div class="col-lg-12 mb-4">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <a href="{{ route('reception.students.create') }}" class="btn btn-primary btn-block">
+                                            <i class="fas fa-user-plus"></i> Add Student
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <a href="{{ route('reception.payments.create') }}" class="btn btn-success btn-block">
+                                            <i class="fas fa-credit-card"></i> Record Payment
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <a href="{{ route('reception.students.index') }}" class="btn btn-info btn-block">
+                                            <i class="fas fa-list"></i> View Students
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <a href="{{ route('reception.reports.index') }}" class="btn btn-warning btn-block">
+                                            <i class="fas fa-chart-bar"></i> Generate Report
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -19,29 +19,41 @@
 
         <form action="{{ route('reception.payments.store') }}" method="POST">
             @csrf
-            <div class="mb-4">
-                <label for="student_id" class="block text-gray-700 text-sm font-bold mb-2">Student:</label>
-                <select name="student_id" id="student_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                    @foreach($students as $student)
-                        <option value="{{ $student->id }}">{{ $student->name }}</option>
-                    @endforeach
-                </select>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="mb-4">
+                    <label for="student_id" class="block text-gray-700 text-sm font-bold mb-2">Student:</label>
+                    <select name="student_id" id="student_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        <option value="">Select a student</option>
+                        @foreach($students as $student)
+                            <option value="{{ $student->id }}">{{ $student->full_name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="amount" class="block text-gray-700 text-sm font-bold mb-2">Amount:</label>
+                    <input type="number" step="0.01" name="amount" id="amount" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                </div>
+                <div class="mb-4">
+                    <label for="payment_date" class="block text-gray-700 text-sm font-bold mb-2">Payment Date:</label>
+                    <input type="date" name="payment_date" id="payment_date" value="{{ date('Y-m-d') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                </div>
+                <div class="mb-4">
+                    <label for="payment_method" class="block text-gray-700 text-sm font-bold mb-2">Payment Method:</label>
+                    <select name="payment_method" id="payment_method" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        <option value="">Select payment method</option>
+                        <option value="cash">Cash</option>
+                        <option value="card">Card</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="receipt_number" class="block text-gray-700 text-sm font-bold mb-2">Receipt Number:</label>
+                    <input type="text" name="receipt_number" id="receipt_number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Auto-generated if empty">
+                </div>
             </div>
             <div class="mb-4">
-                <label for="amount" class="block text-gray-700 text-sm font-bold mb-2">Amount:</label>
-                <input type="number" name="amount" id="amount" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-            </div>
-            <div class="mb-4">
-                <label for="payment_date" class="block text-gray-700 text-sm font-bold mb-2">Date:</label>
-                <input type="date" name="payment_date" id="payment_date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-            </div>
-            <div class="mb-4">
-                <label for="payment_method" class="block text-gray-700 text-sm font-bold mb-2">Payment Method:</label>
-                <select name="payment_method" id="payment_method" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                    <option value="cash">Cash</option>
-                    <option value="card">Card</option>
-                    <option value="bank_transfer">Bank Transfer</option>
-                </select>
+                <label for="notes" class="block text-gray-700 text-sm font-bold mb-2">Notes (Optional):</label>
+                <textarea name="notes" id="notes" rows="3" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Additional notes or comments"></textarea>
             </div>
             <div class="flex items-center justify-between">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">

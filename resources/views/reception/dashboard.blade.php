@@ -26,13 +26,13 @@
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-sm text-gray-600">Total Students</p>
-                    <h3 class="text-2xl font-bold text-gray-800">1,245</h3>
+                    <h3 class="text-2xl font-bold text-gray-800">{{ number_format($totalStudents) }}</h3>
                 </div>
                 <div class="bg-blue-100 p-3 rounded-full">
                     <i class="fas fa-user-graduate text-blue-600 text-xl"></i>
                 </div>
             </div>
-            <p class="text-xs text-gray-500 mt-2"><span class="text-green-600">+12</span> new this week</p>
+            <p class="text-xs text-gray-500 mt-2"><span class="text-green-600">+{{ $weeklyNewStudents }}</span> new this week</p>
         </div>
 
         <!-- Today's Registrations -->
@@ -40,13 +40,19 @@
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-sm text-gray-600">Today's Registrations</p>
-                    <h3 class="text-2xl font-bold text-gray-800">8</h3>
+                    <h3 class="text-2xl font-bold text-gray-800">{{ $todaysRegistrations }}</h3>
                 </div>
                 <div class="bg-green-100 p-3 rounded-full">
                     <i class="fas fa-user-plus text-green-600 text-xl"></i>
                 </div>
             </div>
-            <p class="text-xs text-gray-500 mt-2"><span class="text-green-600">+2</span> from yesterday</p>
+            <p class="text-xs text-gray-500 mt-2">
+                @if($todaysRegistrations > 0)
+                    <span class="text-green-600">Active</span> registration day
+                @else
+                    <span class="text-gray-600">No</span> registrations yet today
+                @endif
+            </p>
         </div>
 
         <!-- Pending Payments -->
@@ -54,13 +60,19 @@
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-sm text-gray-600">Pending Payments</p>
-                    <h3 class="text-2xl font-bold text-gray-800">23</h3>
+                    <h3 class="text-2xl font-bold text-gray-800">{{ $pendingPayments }}</h3>
                 </div>
                 <div class="bg-yellow-100 p-3 rounded-full">
                     <i class="fas fa-clock text-yellow-600 text-xl"></i>
                 </div>
             </div>
-            <p class="text-xs text-gray-500 mt-2"><span class="text-red-600">5</span> overdue</p>
+            <p class="text-xs text-gray-500 mt-2">
+                @if($overduePayments > 0)
+                    <span class="text-red-600">{{ $overduePayments }}</span> overdue
+                @else
+                    <span class="text-green-600">All up to date</span>
+                @endif
+            </p>
         </div>
 
         <!-- Today's Revenue -->
@@ -68,13 +80,24 @@
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-sm text-gray-600">Today's Revenue</p>
-                    <h3 class="text-2xl font-bold text-gray-800">$2,340</h3>
+                    <h3 class="text-2xl font-bold text-gray-800">${{ number_format($todaysRevenue, 2) }}</h3>
                 </div>
                 <div class="bg-purple-100 p-3 rounded-full">
                     <i class="fas fa-dollar-sign text-purple-600 text-xl"></i>
                 </div>
             </div>
-            <p class="text-xs text-gray-500 mt-2"><span class="text-green-600">+15%</span> from yesterday</p>
+            <p class="text-xs text-gray-500 mt-2">
+                @php
+                    $revenueChange = $yesterdaysRevenue > 0 ? (($todaysRevenue - $yesterdaysRevenue) / $yesterdaysRevenue) * 100 : 0;
+                @endphp
+                @if($revenueChange > 0)
+                    <span class="text-green-600">+{{ number_format($revenueChange, 1) }}%</span> from yesterday
+                @elseif($revenueChange < 0)
+                    <span class="text-red-600">{{ number_format($revenueChange, 1) }}%</span> from yesterday
+                @else
+                    <span class="text-gray-600">Same as</span> yesterday
+                @endif
+            </p>
         </div>
     </div>
 
@@ -110,46 +133,36 @@
                 <a href="#" class="text-sm text-primary-600 hover:text-primary-700">View All</a>
             </div>
             <div class="space-y-4">
-                <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                        <i class="fas fa-user-plus text-green-600 text-sm"></i>
+                @forelse($recentActivities as $activity)
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-{{ 
+                            str_contains(strtolower($activity->action), 'student') ? 'green' : 
+                            (str_contains(strtolower($activity->action), 'payment') ? 'blue' : 
+                            (str_contains(strtolower($activity->action), 'update') ? 'purple' : 'gray'))
+                        }}-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-{{ 
+                                str_contains(strtolower($activity->action), 'student') ? 'user-plus' : 
+                                (str_contains(strtolower($activity->action), 'payment') ? 'credit-card' : 
+                                (str_contains(strtolower($activity->action), 'update') ? 'edit' : 'activity'))
+                            }} text-{{ 
+                                str_contains(strtolower($activity->action), 'student') ? 'green' : 
+                                (str_contains(strtolower($activity->action), 'payment') ? 'blue' : 
+                                (str_contains(strtolower($activity->action), 'update') ? 'purple' : 'gray'))
+                            }}-600 text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-800">{{ $activity->action }}</p>
+                            @if($activity->description)
+                                <p class="text-xs text-gray-500">{{ Str::limit($activity->description, 50) }}</p>
+                            @endif
+                        </div>
+                        <span class="text-xs text-gray-400">{{ $activity->created_at->diffForHumans() }}</span>
                     </div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-800">New student registration</p>
-                        <p class="text-xs text-gray-500">John Doe - Web Development</p>
+                @empty
+                    <div class="text-center py-4">
+                        <p class="text-sm text-gray-500">No recent activities found</p>
                     </div>
-                    <span class="text-xs text-gray-400">10:30 AM</span>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <i class="fas fa-credit-card text-blue-600 text-sm"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-800">Payment received</p>
-                        <p class="text-xs text-gray-500">Jane Smith - $500</p>
-                    </div>
-                    <span class="text-xs text-gray-400">09:45 AM</span>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                        <i class="fas fa-envelope text-yellow-600 text-sm"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-800">Reminder sent</p>
-                        <p class="text-xs text-gray-500">Payment due - Mike Johnson</p>
-                    </div>
-                    <span class="text-xs text-gray-400">09:15 AM</span>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                        <i class="fas fa-edit text-purple-600 text-sm"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-800">Student information updated</p>
-                        <p class="text-xs text-gray-500">Sarah Wilson - Contact details</p>
-                    </div>
-                    <span class="text-xs text-gray-400">Yesterday</span>
-                </div>
+                @endforelse
             </div>
         </div>
     </div>
@@ -197,39 +210,60 @@
         <div class="bg-white shadow-sm rounded-lg p-6">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold text-gray-800">Pending Tasks</h3>
-                <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">3 Urgent</span>
+                @php
+                    $urgentTasks = 0;
+                    if($overduePaymentSchedules > 0) $urgentTasks++;
+                    if($studentsNeedingVerification > 0) $urgentTasks++;
+                @endphp
+                @if($urgentTasks > 0)
+                    <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">{{ $urgentTasks }} Urgent</span>
+                @else
+                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">All Clear</span>
+                @endif
             </div>
             <div class="space-y-3">
-                <div class="flex items-center justify-between p-3 border border-red-200 rounded-lg">
-                    <div class="flex items-center space-x-3">
-                        <input type="checkbox" class="rounded border-gray-300 text-red-600 focus:ring-red-500">
-                        <div>
-                            <p class="text-sm font-medium text-gray-800">Follow up on overdue payments</p>
-                            <p class="text-xs text-gray-600">5 payments pending > 30 days</p>
+                @if($overduePaymentSchedules > 0)
+                    <div class="flex items-center justify-between p-3 border border-red-200 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <input type="checkbox" class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+                            <div>
+                                <p class="text-sm font-medium text-gray-800">Follow up on overdue payments</p>
+                                <p class="text-xs text-gray-600">{{ $overduePaymentSchedules }} payments overdue</p>
+                            </div>
                         </div>
+                        <span class="text-red-600 text-sm">Urgent</span>
                     </div>
-                    <span class="text-red-600 text-sm">Urgent</span>
-                </div>
-                <div class="flex items-center justify-between p-3 border border-yellow-200 rounded-lg">
-                    <div class="flex items-center space-x-3">
-                        <input type="checkbox" class="rounded border-gray-300 text-yellow-600 focus:ring-yellow-500">
-                        <div>
-                            <p class="text-sm font-medium text-gray-800">Update student records</p>
-                            <p class="text-xs text-gray-600">12 records need verification</p>
+                @endif
+                
+                @if($studentsNeedingVerification > 0)
+                    <div class="flex items-center justify-between p-3 border border-yellow-200 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <input type="checkbox" class="rounded border-gray-300 text-yellow-600 focus:ring-yellow-500">
+                            <div>
+                                <p class="text-sm font-medium text-gray-800">Update student records</p>
+                                <p class="text-xs text-gray-600">{{ $studentsNeedingVerification }} records need verification</p>
+                            </div>
                         </div>
+                        <span class="text-yellow-600 text-sm">Today</span>
                     </div>
-                    <span class="text-yellow-600 text-sm">Today</span>
-                </div>
+                @endif
+                
                 <div class="flex items-center justify-between p-3 border border-blue-200 rounded-lg">
                     <div class="flex items-center space-x-3">
                         <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                         <div>
                             <p class="text-sm font-medium text-gray-800">Prepare weekly report</p>
-                            <p class="text-xs text-gray-600">Due by Friday EOD</p>
+                            <p class="text-xs text-gray-600">Due by {{ now()->endOfWeek()->format('l') }} EOD</p>
                         </div>
                     </div>
                     <span class="text-blue-600 text-sm">This week</span>
                 </div>
+                
+                @if($overduePaymentSchedules == 0 && $studentsNeedingVerification == 0)
+                    <div class="text-center py-4">
+                        <p class="text-sm text-gray-500">Great! No urgent tasks at the moment.</p>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

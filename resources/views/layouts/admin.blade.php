@@ -125,7 +125,11 @@
                     <i class="fas fa-credit-card w-5"></i>
                     <span class="ml-3 nav-text">Payments</span>
                 </a>
-                <a href="#" class="flex items-center py-2 px-4 nav-link">
+                <a href="{{ route('admin.notifications.index') }}" class="flex items-center py-2 px-4 nav-link">
+                    <i class="fas fa-bell w-5"></i>
+                    <span class="ml-3 nav-text">Notifications</span>
+                </a>
+                <a href="{{ route('admin.reports.index') }}" class="flex items-center py-2 px-4 nav-link">
                     <i class="fas fa-chart-bar w-5"></i>
                     <span class="ml-3 nav-text">Reports</span>
                 </a>

@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-8">
+    <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-8">
         <h1 class="text-2xl font-semibold mb-6">Add New Student</h1>
 
         @if ($errors->any())
@@ -19,19 +19,65 @@
 
         <form action="{{ route('reception.students.store') }}" method="POST">
             @csrf
-            <div class="mb-4">
-                <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
-                <input type="text" name="name" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                    <input type="text" name="first_name" id="first_name" value="{{ old('first_name') }}" 
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+                </div>
+                <div>
+                    <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                    <input type="text" name="last_name" id="last_name" value="{{ old('last_name') }}" 
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" name="email" id="email" value="{{ old('email') }}" 
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+                </div>
+                <div>
+                    <label for="student_phone" class="block text-sm font-medium text-gray-700 mb-2">Student Phone</label>
+                    <input type="text" name="student_phone" id="student_phone" value="{{ old('student_phone') }}" 
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+                </div>
+                <div>
+                    <label for="parent_phone" class="block text-sm font-medium text-gray-700 mb-2">Parent Phone</label>
+                    <input type="text" name="parent_phone" id="parent_phone" value="{{ old('parent_phone') }}" 
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+                </div>
+                <div>
+                    <label for="date_of_birth" class="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+                    <input type="date" name="date_of_birth" id="date_of_birth" value="{{ old('date_of_birth') }}" 
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                    <textarea name="address" id="address" rows="3" 
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">{{ old('address') }}</textarea>
+                </div>
+                <div>
+                    <label for="course_id" class="block text-sm font-medium text-gray-700 mb-2">Course</label>
+                    <select name="course_id" id="course_id" 
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+                        <option value="">Select a Course</option>
+                        @foreach($courses as $course)
+                            <option value="{{ $course->id }}" {{ old('course_id') == $course->id ? 'selected' : '' }}>
+                                {{ $course->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select name="status" id="status" 
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+                        <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    </select>
+                </div>
             </div>
-            <div class="mb-4">
-                <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-                <input type="email" name="email" id="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            </div>
-            <div class="mb-4">
-                <label for="phone" class="block text-gray-700 text-sm font-bold mb-2">Phone:</label>
-                <input type="text" name="phone" id="phone" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            </div>
-            <div class="flex items-center justify-between">
+            
+            <div class="flex items-center justify-between mt-6">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                     Add Student
                 </button>

@@ -26,12 +26,20 @@ class ReceptionPaymentController extends Controller
     {
         $request->validate([
             'student_id' => 'required|exists:students,id',
-            'amount' => 'required|numeric',
+            'amount' => 'required|numeric|gt:0',
             'payment_date' => 'required|date',
-            'payment_method' => 'required|string',
+            'payment_method' => 'required|in:cash,card,bank_transfer',
+            'receipt_number' => 'nullable|string|max:100|unique:payments,receipt_number',
+            'notes' => 'nullable|string|max:200',
         ]);
 
         $data = $request->all();
+        
+        // Generate receipt number if not provided
+        if (empty($data['receipt_number'])) {
+            $data['receipt_number'] = Payment::generateReceiptNumber();
+        }
+        
         $data['recorded_by'] = Auth::id();
 
         Payment::create($data);
@@ -55,12 +63,21 @@ class ReceptionPaymentController extends Controller
     {
         $request->validate([
             'student_id' => 'required|exists:students,id',
-            'amount' => 'required|numeric',
+            'amount' => 'required|numeric|gt:0',
             'payment_date' => 'required|date',
-            'payment_method' => 'required|string',
+            'payment_method' => 'required|in:cash,card,bank_transfer',
+            'receipt_number' => 'nullable|string|max:100|unique:payments,receipt_number,' . $payment->id,
+            'notes' => 'nullable|string|max:200',
         ]);
 
-        $payment->update($request->all());
+        $data = $request->all();
+        
+        // Generate receipt number if not provided and currently empty
+        if (empty($data['receipt_number']) && empty($payment->receipt_number)) {
+            $data['receipt_number'] = Payment::generateReceiptNumber();
+        }
+
+        $payment->update($data);
 
         return redirect()->route('reception.payments.index')
                          ->with('success', 'Payment updated successfully.');

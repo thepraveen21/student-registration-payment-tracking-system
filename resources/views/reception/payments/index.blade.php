@@ -37,6 +37,9 @@
                         Payment Method
                     </th>
                     <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Receipt #
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                         Actions
                     </th>
                 </tr>
@@ -48,16 +51,21 @@
                             {{ $payment->id }}
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ $payment->student->name }}</p>
+                            <p class="text-gray-900 whitespace-no-wrap">{{ $payment->student->full_name ?? 'N/A' }}</p>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ $payment->amount }}</p>
+                            <p class="text-gray-900 whitespace-no-wrap">₹{{ number_format($payment->amount, 2) }}</p>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ $payment->payment_date ? $payment->payment_date->format('Y-m-d') : 'N/A' }}</p>
+                            <p class="text-gray-900 whitespace-no-wrap">{{ $payment->payment_date ? $payment->payment_date->format('M d, Y') : 'N/A' }}</p>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ $payment->payment_method }}</p>
+                            <span class="inline-block px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-200 rounded-full">
+                                {{ $payment->payment_method_display }}
+                            </span>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 whitespace-no-wrap">{{ $payment->receipt_number }}</p>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <a href="{{ route('reception.payments.show', $payment) }}" class="text-blue-600 hover:text-blue-900 mr-3">View</a>
@@ -71,7 +79,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center py-10 text-gray-500">
+                        <td colspan="7" class="text-center py-10 text-gray-500">
                             No payments found.
                         </td>
                     </tr>

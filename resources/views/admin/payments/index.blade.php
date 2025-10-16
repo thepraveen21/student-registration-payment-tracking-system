@@ -38,7 +38,11 @@
                             </th>
                             <th
                                 class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                Status
+                                Method
+                            </th>
+                            <th
+                                class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Receipt #
                             </th>
                             <th
                                 class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -50,21 +54,22 @@
                         @foreach ($payments as $payment)
                         <tr>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                <p class="text-gray-900 whitespace-no-wrap">{{ $payment->student->first_name }} {{ $payment->student->last_name }}</p>
+                                <p class="text-gray-900 whitespace-no-wrap">{{ $payment->student->full_name }}</p>
                             </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                <p class="text-gray-900 whitespace-no-wrap">{{ $payment->amount }}</p>
+                                <p class="text-gray-900 whitespace-no-wrap">₹{{ number_format($payment->amount, 2) }}</p>
                             </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                <p class="text-gray-900 whitespace-no-wrap">{{ $payment->payment_date }}</p>
+                                <p class="text-gray-900 whitespace-no-wrap">{{ $payment->payment_date->format('M d, Y') }}</p>
                             </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                <span
-                                    class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
-                                    <span aria-hidden
-                                        class="absolute inset-0 {{ $payment->status == 'paid' ? 'bg-green-200' : 'bg-red-200' }} opacity-50 rounded-full"></span>
-                                    <span class="relative">{{ ucfirst($payment->status) }}</span>
+                                <span class="relative inline-block px-3 py-1 font-semibold text-blue-900 leading-tight">
+                                    <span aria-hidden class="absolute inset-0 bg-blue-200 opacity-50 rounded-full"></span>
+                                    <span class="relative">{{ $payment->payment_method_display }}</span>
                                 </span>
+                            </td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <p class="text-gray-900 whitespace-no-wrap">{{ $payment->receipt_number }}</p>
                             </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                 <a href="{{ route('admin.payments.show', $payment->id) }}" class="text-indigo-600 hover:text-indigo-900">Show</a>

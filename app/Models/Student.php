@@ -42,6 +42,25 @@ class Student extends Model
         return $this->hasMany(Notification::class);
     }
 
+    /**
+     * Get the full URL for the student's QR code
+     */
+    public function getQrCodeUrlAttribute()
+    {
+        if ($this->qr_code_path) {
+            return asset('storage/' . $this->qr_code_path);
+        }
+        return null;
+    }
+
+    /**
+     * Get the full name of the student
+     */
+    public function getFullNameAttribute()
+    {
+        return $this->first_name . ' ' . $this->last_name;
+    }
+
     public function index()
     {
         $students = Student::with('course')->paginate(10);

@@ -68,14 +68,14 @@ class StudentController extends Controller
         // Generate registration number
         $registrationNumber = 'REG-' . str_pad(Student::count() + 1, 4, '0', STR_PAD_LEFT);
         
-        // Generate QR code (optional)
-        $qrCodePath = null;
-        if ($request->generate_qr) {
-            $qrCode = QrCode::format('png')->size(200)->generate($registrationNumber);
-            $fileName = 'qrcode_' . $registrationNumber . '_' . time() . '.png';
-            $qrCodePath = 'qrcodes/' . $fileName;
-            \Storage::disk('public')->put($qrCodePath, $qrCode);
-        }
+        // Generate QR code (always generate as per SRS requirements)
+        $qrCode = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(200)->generate($registrationNumber);
+        $fileName = 'qrcode_' . $registrationNumber . '_' . time() . '.svg';
+        $qrCodePath = 'qrcodes/' . $fileName;
+        
+        // Ensure the qrcodes directory exists
+        \Storage::disk('public')->makeDirectory('qrcodes');
+        \Storage::disk('public')->put($qrCodePath, $qrCode);
 
         $student = new Student();
         $student->fill($request->all());
