@@ -19,7 +19,7 @@
                 <tr>
                     <td>{{ $payment->id }}</td>
                     <td>{{ $payment->student?->first_name }} {{ $payment->student?->last_name }}</td>
-                    <td>${{ number_format($payment->amount, 2) }}</td>
+                    <td>Rs.{{ number_format($payment->amount, 2) }}</td>
                     <td>{{ $payment->payment_date }}</td>
                     <td>{{ $payment->recorded_by }}</td>
                 </tr>

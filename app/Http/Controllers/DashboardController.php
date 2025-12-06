@@ -20,20 +20,40 @@ class DashboardController extends Controller
         $overduePayments = PaymentSchedule::where('status', 'overdue')->count();
         $monthlyRevenue = Payment::whereMonth('created_at', now()->month)->sum('amount');
 
-        $paymentChartData = Payment::select(
-            DB::raw('sum(amount) as total'),
-            DB::raw("DATE_FORMAT(created_at, '%b') as month")
-        )
-        ->groupBy('month')
-        ->get()
-        ->pluck('total', 'month');
+        // Payment chart: last 6 months (ensures chronological labels and zero-fill)
+        $months = collect();
+        for ($i = 5; $i >= 0; $i--) {
+            $months->push(now()->subMonths($i)->format('M Y'));
+        }
 
-        $courseChartData = Student::with('course')
+        $paymentSums = Payment::select(
+            DB::raw('YEAR(created_at) as yr'),
+            DB::raw('MONTH(created_at) as mth'),
+            // Use MIN(created_at) inside DATE_FORMAT so month_label is an aggregate
+            DB::raw("DATE_FORMAT(MIN(created_at), '%b %Y') as month_label"),
+            DB::raw('SUM(amount) as total')
+        )
+        ->whereBetween('created_at', [now()->subMonths(5)->startOfMonth(), now()->endOfMonth()])
+        ->groupBy('yr', 'mth')
+        ->orderBy('yr', 'asc')
+        ->orderBy('mth', 'asc')
+        ->get()
+        ->mapWithKeys(function ($row) {
+            return [$row->month_label => (float) $row->total];
+        });
+
+        // Ensure every month appears (fill missing months with 0)
+        $paymentChartData = $months->mapWithKeys(function ($m) use ($paymentSums) {
+            return [$m => $paymentSums->get($m) ?? 0];
+        });
+
+        // Course distribution: include all courses (zero where no students)
+        $courseChartData = Course::leftJoin('students', 'courses.id', '=', 'students.course_id')
+            ->select('courses.name', DB::raw('COUNT(students.id) as students_count'))
+            ->groupBy('courses.id', 'courses.name')
+            ->orderBy('courses.name')
             ->get()
-            ->groupBy('course.name')
-            ->map(function ($students) {
-                return $students->count();
-            });
+            ->pluck('students_count', 'name');
 
         $recentStudents = Student::with('course')->latest()->take(5)->get();
         $recentPayments = Payment::with('student')->latest()->take(5)->get();

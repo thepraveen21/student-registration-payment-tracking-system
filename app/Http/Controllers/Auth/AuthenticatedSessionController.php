@@ -29,7 +29,7 @@ class AuthenticatedSessionController extends Controller
         }
 
         if ($user->role === 'receptionist') {
-            return redirect()->route('Reception');
+            return redirect()->route('reception.dashboard');
         }
 
         // fallback: send to admin dashboard if no role match

@@ -7,6 +7,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+
+    {{--  QR Code library  --}}
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+
     <script>
         tailwind.config = {
             theme: {
@@ -101,11 +106,19 @@
                     <i class="fas fa-credit-card w-5"></i>
                     <span class="ml-3 nav-text">Payments</span>
                 </a>
-                <a href="#" class="flex items-center py-2 px-4 nav-link">
+                <a href="{{ route('reception.attendance.index') }}" class="flex items-center py-2 px-4 nav-link {{ request()->routeIs('reception.attendance.*') ? 'active' : '' }}">
+                    <i class="fas fa-user-check w-5"></i>
+                    <span class="ml-3 nav-text">Attendance</span>
+                </a>
+                <a href="{{ route('reception.qrcodes.manage') }}" class="flex items-center py-2 px-4 nav-link {{ request()->routeIs('reception.qrcodes.*') ? 'active' : '' }}">
+                    <i class="fas fa-qrcode w-5"></i>
+                    <span class="ml-3 nav-text">QR Codes</span>
+                </a>
+                <a href="{{ route('reception.schedule.index') }}" class="flex items-center py-2 px-4 nav-link">
                     <i class="fas fa-calendar-alt w-5"></i>
                     <span class="ml-3 nav-text">Schedule</span>
                 </a>
-                <a href="#" class="flex items-center py-2 px-4 nav-link">
+                <a href="{{ route('reception.reports.index') }}" class="flex items-center py-2 px-4 nav-link">
                     <i class="fas fa-chart-bar w-5"></i>
                     <span class="ml-3 nav-text">Reports</span>
                 </a>
@@ -157,6 +170,7 @@
         </div>
     </div>
 
-    @yield('scripts')
+    {{-- ✅ Allows page-specific scripts like QR scanner --}}
+    @stack('scripts')
 </body>
 </html>

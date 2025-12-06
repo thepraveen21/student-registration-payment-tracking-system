@@ -10,7 +10,7 @@ class StudentSeeder extends Seeder
 {
     public function run(): void
     {
-        Student::factory()->count(10)->create();
+        Student::factory()->count(20)->create();
 
         // Or if inserting manually, make sure columns match migration
         /*

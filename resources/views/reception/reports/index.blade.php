@@ -1,83 +1,183 @@
 @extends('layouts.reception')
 
-@section('header', 'Reports')
+@section('header', 'Attendance Matrix')
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-2xl font-semibold mb-6">Payment Reports</h1>
 
-    <div class="bg-white shadow-md rounded-lg p-6 mb-6">
-        <form action="{{ route('reception.reports.index') }}" method="GET">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label for="start_date" class="block text-gray-700 text-sm font-bold mb-2">Start Date:</label>
-                    <input type="date" name="start_date" id="start_date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value="{{ request('start_date') }}">
-                </div>
-                <div>
-                    <label for="end_date" class="block text-gray-700 text-sm font-bold mb-2">End Date:</label>
-                    <input type="date" name="end_date" id="end_date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value="{{ request('end_date') }}">
-                </div>
-                <div class="flex items-end">
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                        Filter
-                    </button>
-                </div>
+    <h1 class="text-2xl font-bold mb-4">Attendance Matrix (4 months / 16 weeks)</h1>
+
+    {{-- Filter row --}}
+    <form method="GET" class="mb-4 inline-block w-full">
+        <div class="flex flex-col md:flex-row md:items-end md:space-x-4 gap-3">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Course</label>
+                <select name="course_id" class="mt-1 block w-full border rounded px-3 py-2">
+                    <option value="">All courses</option>
+                    @foreach($courses as $c)
+                        <option value="{{ $c->id }}" {{ request('course_id') == $c->id ? 'selected' : '' }}>
+                            {{ $c->name }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
-        </form>
+
+            <div class="md:ml-auto">
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Filter</button>
+            </div>
+        </div>
+    </form>
+
+    {{-- Legend --}}
+    <div class="flex items-center space-x-4 mb-4">
+        <div class="flex items-center space-x-2">
+            <div class="w-4 h-4 bg-green-500 rounded"></div><div class="text-sm">Attended (≥1 day in week)</div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <div class="w-4 h-4 bg-red-500 rounded"></div><div class="text-sm">Absent (no days in week)</div>
+        </div>
+        <div class="ml-6 text-sm text-gray-600">Note: each student's course start = student registration date.</div>
     </div>
 
-    <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <table class="min-w-full leading-normal">
+    <div class="overflow-auto border rounded bg-white shadow">
+        <table class="min-w-max w-full table-auto">
             <thead>
-                <tr>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        ID
-                    </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Student
-                    </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Amount
-                    </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Date
-                    </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Status
-                    </th>
+                {{-- Top header: Student columns + 4 month groups --}}
+                <tr class="bg-gray-100">
+                    <th class="px-4 py-3 text-left font-semibold sticky left-0 bg-gray-100 z-10">Student</th>
+                    <th class="px-4 py-3 text-left font-semibold sticky left-0 bg-gray-100 z-10">Course</th>
+                    <th class="px-4 py-3 text-left font-semibold sticky left-0 bg-gray-100 z-10">Center</th>
+
+                    @for($m = 1; $m <= 4; $m++)
+                        <th colspan="4" class="px-4 py-3 text-center font-semibold border-l">
+                            Month {{ $m }}
+                        </th>
+                    @endfor
+
+                    <th class="px-4 py-3 text-center font-semibold border-l">Presence %</th>
+                </tr>
+
+                {{-- Second header: week labels --}}
+                <tr class="bg-gray-200">
+                    <th class="px-4 py-2"></th>
+                    <th class="px-4 py-2"></th>
+                    <th class="px-4 py-2"></th>
+
+                    @for($w = 1; $w <= 16; $w++)
+                        <th class="px-2 py-2 text-center text-xs font-medium border-l">W{{ $w }}</th>
+                    @endfor
+
+                    <th class="px-4 py-2 text-center text-xs font-medium">%</th>
                 </tr>
             </thead>
+
             <tbody>
-                @forelse ($payments as $payment)
+                @forelse($students as $student)
                     <tr class="hover:bg-gray-50">
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            {{ $payment->id }}
+                        <td class="px-4 py-3 whitespace-nowrap font-medium sticky left-0 bg-white z-0">
+                            {{ $student->name }}
                         </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ $payment->student->name }}</p>
+                        <td class="px-4 py-3 whitespace-nowrap sticky left-0 bg-white z-0">
+                            {{ $student->course->name ?? '-' }}
                         </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ $payment->amount }}</p>
+                        <td class="px-4 py-3 whitespace-nowrap sticky left-0 bg-white z-0">
+                            {{ $student->center->name ?? '-' }}
                         </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ $payment->date->format('Y-m-d') }}</p>
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <span class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
-                                <span aria-hidden class="absolute inset-0 bg-green-200 opacity-50 rounded-full"></span>
-                                <span class="relative">{{ ucfirst($payment->status) }}</span>
-                            </span>
+
+                        {{-- 16 week boxes --}}
+                        @php
+                            $row = $attendanceMatrix[$student->id] ?? [];
+                        @endphp
+
+                        @for($i = 0; $i < 16; $i++)
+                            @php
+                                $cell = $row[$i] ?? null;
+                                $attended = $cell['attended'] ?? false;
+                                $count = $cell['count'] ?? 0;
+                                $start = isset($cell['start']) ? $cell['start']->format('Y-m-d') : '';
+                                $end = isset($cell['end']) ? $cell['end']->format('Y-m-d') : '';
+                                $title = $start && $end ? "Week ".($i+1).": $start → $end\nAttendances: $count" : "Week ".($i+1);
+                            @endphp
+
+                            <td class="px-2 py-3 text-center border-l">
+                                <div
+                                    title="{{ $title }}"
+                                    class="w-6 h-6 mx-auto rounded transition-shadow"
+                                    style="background-color: {{ $attended ? '#16a34a' : '#ef4444' }};">
+                                </div>
+                            </td>
+                        @endfor
+
+                        {{-- percent --}}
+                        @php
+                            $st = $stats[$student->id] ?? ['percent' => 0];
+                        @endphp
+                        <td class="px-4 py-3 text-center font-semibold">
+                            {{ $st['percent'] ?? 0 }}%
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="text-center py-10 text-gray-500">
-                            No payments found for the selected criteria.
-                        </td>
+                        <td colspan="20" class="px-4 py-6 text-center text-gray-500">No students found.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
+
 </div>
+
+<!-- Monthly Payment Report -->
+<div class="mt-8">
+    <h2 class="text-xl font-semibold mb-4">Monthly Payment Report</h2>
+
+    @forelse($paymentReports as $month => $payments)
+        @php
+            $monthLabel = \Carbon\Carbon::createFromFormat('Y-m', $month)->format('F Y');
+            $monthTotal = $payments->sum('amount');
+        @endphp
+
+        <div class="mb-6 border rounded-lg overflow-hidden shadow-sm">
+            <div class="bg-gray-100 px-4 py-2 font-semibold text-gray-700">
+                {{ $monthLabel }}
+            </div>
+
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Student</th>
+                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Center</th>
+                        <th class="px-4 py-2 text-right text-sm font-medium text-gray-700">Payment (Rs.)</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @foreach($payments as $row)
+                        <tr>
+                            <td class="px-4 py-2">
+                                {{ $row->first_name }} {{ $row->last_name }}
+                            </td>
+                            <td class="px-4 py-2">
+                                {{ $row->center_name ?? 'N/A' }}
+                            </td>
+                            <td class="px-4 py-2 text-right font-medium">
+                                {{ number_format($row->amount, 2) }}
+                            </td>
+                        </tr>
+                    @endforeach
+
+                    <!-- Month Total -->
+                    <tr class="bg-gray-50 font-semibold">
+                        <td colspan="2" class="px-4 py-2 text-right">Total:</td>
+                        <td class="px-4 py-2 text-right">
+                            {{ number_format($monthTotal, 2) }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    @empty
+        <p class="text-gray-500">No monthly payments recorded yet.</p>
+    @endforelse
+</div>
+
 @endsection

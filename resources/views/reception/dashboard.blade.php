@@ -14,13 +14,12 @@
             </div>
             <div class="text-right">
                 <p class="text-lg font-semibold text-gray-800">{{ now()->format('l, F j, Y') }}</p>
-                <p class="text-gray-600">{{ now()->format('g:i A') }}</p>
             </div>
         </div>
     </div>
 
     <!-- Quick Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <!-- Total Students -->
         <div class="stat-card bg-white rounded-lg p-6 border-l-4 border-blue-500">
             <div class="flex justify-between items-start">
@@ -55,6 +54,22 @@
             </p>
         </div>
 
+        <!-- QR Code Stats -->
+        <div class="stat-card bg-white rounded-lg p-6 border-l-4 border-indigo-500">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-sm text-gray-600">Available QR Codes</p>
+                    <h3 class="text-2xl font-bold text-gray-800">{{ App\Models\QRCode::whereNull('student_id')->count() }}</h3>
+                </div>
+                <div class="bg-indigo-100 p-3 rounded-full">
+                    <i class="fas fa-qrcode text-indigo-600 text-xl"></i>
+                </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">
+                <span class="text-indigo-600">{{ App\Models\QRCode::whereNotNull('student_id')->count() }}</span> assigned
+            </p>
+        </div>
+
         <!-- Pending Payments -->
         <div class="stat-card bg-white rounded-lg p-6 border-l-4 border-yellow-500">
             <div class="flex justify-between items-start">
@@ -80,7 +95,7 @@
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-sm text-gray-600">Today's Revenue</p>
-                    <h3 class="text-2xl font-bold text-gray-800">${{ number_format($todaysRevenue, 2) }}</h3>
+                    <h3 class="text-2xl font-bold text-gray-800">Rs.{{ number_format($todaysRevenue, 2) }}</h3>
                 </div>
                 <div class="bg-purple-100 p-3 rounded-full">
                     <i class="fas fa-dollar-sign text-purple-600 text-xl"></i>
@@ -106,14 +121,18 @@
         <!-- Quick Actions Card -->
         <div class="bg-white shadow-sm rounded-lg p-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-3 gap-4">
                 <a href="{{ route('reception.students.create') }}" class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors group">
                     <i class="fas fa-user-plus text-2xl text-gray-400 group-hover:text-primary-600 mb-2"></i>
                     <span class="text-sm font-medium text-gray-700 group-hover:text-primary-700">New Student</span>
                 </a>
-                <a href="{{ route('reception.payments.create') }}" class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors group">
+                <a href="{{ route('centers.create') }}" class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors group">
                     <i class="fas fa-credit-card text-2xl text-gray-400 group-hover:text-primary-600 mb-2"></i>
-                    <span class="text-sm font-medium text-gray-700 group-hover:text-primary-700">Record Payment</span>
+                    <span class="text-sm font-medium text-gray-700 group-hover:text-primary-700">Add Center</span>
+                </a>
+                <a href="{{ route('reception.qrcodes.manage') }}" class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors group">
+                    <i class="fas fa-qrcode text-2xl text-gray-400 group-hover:text-primary-600 mb-2"></i>
+                    <span class="text-sm font-medium text-gray-700 group-hover:text-primary-700">Manage QR Codes</span>
                 </a>
                 <a href="{{ route('reception.students.index') }}" class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors group">
                     <i class="fas fa-list text-2xl text-gray-400 group-hover:text-primary-600 mb-2"></i>
@@ -122,6 +141,14 @@
                 <a href="{{ route('reception.payments.index') }}" class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors group">
                     <i class="fas fa-receipt text-2xl text-gray-400 group-hover:text-primary-600 mb-2"></i>
                     <span class="text-sm font-medium text-gray-700 group-hover:text-primary-700">Payment History</span>
+                </a>
+                <a href="{{ route('reception.qrcodes.print-batch') }}" class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors group">
+                    <i class="fas fa-print text-2xl text-gray-400 group-hover:text-primary-600 mb-2"></i>
+                    <span class="text-sm font-medium text-gray-700 group-hover:text-primary-700">Print QR Codes</span>
+                </a>
+                <a href="{{ route('courses.create') }}" class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors group">
+                    <i class="fas fa-book text-2xl text-gray-400 group-hover:text-primary-600 mb-2"></i>
+                    <span class="text-sm font-medium text-gray-700 group-hover:text-primary-700">Add Courses</span>
                 </a>
             </div>
         </div>
@@ -171,38 +198,30 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Today's Schedule -->
         <div class="bg-white shadow-sm rounded-lg p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Today's Schedule</h3>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">Today's Schedule</h3>
+                <a href="{{ route('reception.schedule.index') }}" class="text-sm text-primary-600 hover:text-primary-700">View All</a>
+            </div>
             <div class="space-y-3">
-                <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-2 h-8 bg-blue-500 rounded-full"></div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-800">Student Orientation</p>
-                            <p class="text-xs text-gray-600">10:00 AM - Conference Room</p>
+                @forelse($todaySchedules as $schedule)
+                    <div class="flex items-center justify-between p-3 rounded-lg 
+                        {{ $schedule->status == 'Upcoming' ? 'bg-blue-50' : ($schedule->status == 'Scheduled' ? 'bg-green-50' : 'bg-gray-50') }}">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-2 h-8 rounded-full 
+                                {{ $schedule->status == 'Upcoming' ? 'bg-blue-500' : ($schedule->status == 'Scheduled' ? 'bg-green-500' : 'bg-gray-400') }}"></div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-800">{{ $schedule->title }}</p>
+                                <p class="text-xs text-gray-600">{{ $schedule->time }} - {{ $schedule->location }}</p>
+                            </div>
                         </div>
+                        <span class="px-2 py-1 text-xs rounded-full 
+                            {{ $schedule->status == 'Upcoming' ? 'bg-blue-100 text-blue-800' : ($schedule->status == 'Scheduled' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800') }}">
+                            {{ $schedule->status }}
+                        </span>
                     </div>
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Upcoming</span>
-                </div>
-                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-2 h-8 bg-green-500 rounded-full"></div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-800">Payment Collection</p>
-                            <p class="text-xs text-gray-600">2:00 PM - Reception</p>
-                        </div>
-                    </div>
-                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Scheduled</span>
-                </div>
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-2 h-8 bg-gray-400 rounded-full"></div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-800">Staff Meeting</p>
-                            <p class="text-xs text-gray-600">4:00 PM - Manager's Office</p>
-                        </div>
-                    </div>
-                    <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Later</span>
-                </div>
+                @empty
+                    <p class="text-center text-gray-500">No schedules today</p>
+                @endforelse
             </div>
         </div>
 
@@ -222,47 +241,23 @@
                 @endif
             </div>
             <div class="space-y-3">
-                @if($overduePaymentSchedules > 0)
-                    <div class="flex items-center justify-between p-3 border border-red-200 rounded-lg">
+                @foreach($pendingTasks as $task)
+                    <div class="flex items-center justify-between p-3 border rounded-lg
+                        {{ $task->priority == 'High' ? 'border-red-200' : ($task->priority == 'Medium' ? 'border-yellow-200' : 'border-blue-200') }}">
                         <div class="flex items-center space-x-3">
-                            <input type="checkbox" class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+                            <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                             <div>
-                                <p class="text-sm font-medium text-gray-800">Follow up on overdue payments</p>
-                                <p class="text-xs text-gray-600">{{ $overduePaymentSchedules }} payments overdue</p>
+                                <p class="text-sm font-medium text-gray-800">{{ $task->task }}</p>
+                                <p class="text-xs text-gray-600">Due: {{ $task->due }}</p>
                             </div>
                         </div>
-                        <span class="text-red-600 text-sm">Urgent</span>
+                        <span class="text-sm {{ $task->priority == 'High' ? 'text-red-600' : ($task->priority == 'Medium' ? 'text-yellow-600' : 'text-blue-600') }}">
+                            {{ $task->priority }}
+                        </span>
                     </div>
-                @endif
-                
-                @if($studentsNeedingVerification > 0)
-                    <div class="flex items-center justify-between p-3 border border-yellow-200 rounded-lg">
-                        <div class="flex items-center space-x-3">
-                            <input type="checkbox" class="rounded border-gray-300 text-yellow-600 focus:ring-yellow-500">
-                            <div>
-                                <p class="text-sm font-medium text-gray-800">Update student records</p>
-                                <p class="text-xs text-gray-600">{{ $studentsNeedingVerification }} records need verification</p>
-                            </div>
-                        </div>
-                        <span class="text-yellow-600 text-sm">Today</span>
-                    </div>
-                @endif
-                
-                <div class="flex items-center justify-between p-3 border border-blue-200 rounded-lg">
-                    <div class="flex items-center space-x-3">
-                        <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                        <div>
-                            <p class="text-sm font-medium text-gray-800">Prepare weekly report</p>
-                            <p class="text-xs text-gray-600">Due by {{ now()->endOfWeek()->format('l') }} EOD</p>
-                        </div>
-                    </div>
-                    <span class="text-blue-600 text-sm">This week</span>
-                </div>
-                
-                @if($overduePaymentSchedules == 0 && $studentsNeedingVerification == 0)
-                    <div class="text-center py-4">
-                        <p class="text-sm text-gray-500">Great! No urgent tasks at the moment.</p>
-                    </div>
+                @endforeach
+                @if(count($pendingTasks) == 0)
+                    <p class="text-center text-gray-500">No pending tasks</p>
                 @endif
             </div>
         </div>
@@ -270,50 +265,29 @@
 </div>
 
 <style>
-    .stat-card {
-        transition: all 0.3s ease;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-    .stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
+    .stat-card { transition: all 0.3s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 </style>
 
 @section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Task completion functionality
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const taskItem = this.closest('.flex.items-center.justify-between');
-                if (this.checked) {
-                    taskItem.style.opacity = '0.6';
-                    taskItem.style.textDecoration = 'line-through';
-                } else {
-                    taskItem.style.opacity = '1';
-                    taskItem.style.textDecoration = 'none';
-                }
-            });
-        });
-
-        // Real-time clock update
-        function updateClock() {
-            const now = new Date();
-            const timeElement = document.querySelector('.text-gray-600');
-            if (timeElement) {
-                timeElement.textContent = now.toLocaleTimeString('en-US', { 
-                    hour: 'numeric', 
-                    minute: '2-digit', 
-                    hour12: true 
-                });
+document.addEventListener('DOMContentLoaded', function() {
+    // Task completion
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            const taskItem = this.closest('div.flex.items-center.justify-between');
+            if(this.checked){
+                taskItem.style.opacity='0.6';
+                taskItem.style.textDecoration='line-through';
+            }else{
+                taskItem.style.opacity='1';
+                taskItem.style.textDecoration='none';
             }
-        }
-        
-        // Update clock every minute
-        setInterval(updateClock, 60000);
+        });
     });
+});
 </script>
 @endsection
+
 @endsection

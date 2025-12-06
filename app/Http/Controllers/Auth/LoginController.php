@@ -20,7 +20,7 @@ class LoginController extends Controller
         if ($user->role === 'admin') {
             return route('dashboard');
         } elseif ($user->role === 'receptionist') {
-            return route('Reception');
+            return route('reception.dashboard');
         }
         return '/';
     }

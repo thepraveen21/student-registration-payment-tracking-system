@@ -1,91 +1,147 @@
 @extends('layouts.reception')
 
-@section('header', 'Payments')
+@section('header', 'Monthly Payments')
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-semibold">Payments</h1>
-        <a href="{{ route('reception.payments.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Add Payment
+
+    <!-- PAGE HEADER -->
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 tracking-tight">Students Monthly Payments</h1>
+
+        <a href="{{ route('reception.payments.create') }}"
+           class="bg-green-600 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-green-700 transition transform hover:scale-105">
+            + Record Payment
         </a>
     </div>
 
+    <!-- SUCCESS MESSAGE -->
     @if (session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <span class="block sm:inline">{{ session('success') }}</span>
+        <div class="bg-green-50 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-sm mb-6">
+            <span>{{ session('success') }}</span>
         </div>
     @endif
 
-    <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <table class="min-w-full leading-normal">
-            <thead>
-                <tr>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        ID
-                    </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Student
-                    </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Amount
-                    </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Date
-                    </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Payment Method
-                    </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Receipt #
-                    </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Actions
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($payments as $payment)
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            {{ $payment->id }}
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ $payment->student->full_name ?? 'N/A' }}</p>
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">₹{{ number_format($payment->amount, 2) }}</p>
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ $payment->payment_date ? $payment->payment_date->format('M d, Y') : 'N/A' }}</p>
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <span class="inline-block px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-200 rounded-full">
-                                {{ $payment->payment_method_display }}
-                            </span>
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ $payment->receipt_number }}</p>
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <a href="{{ route('reception.payments.show', $payment) }}" class="text-blue-600 hover:text-blue-900 mr-3">View</a>
-                            <a href="{{ route('reception.payments.edit', $payment) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                            <form action="{{ route('reception.payments.destroy', $payment) }}" method="POST" class="inline-block">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure?')">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="7" class="text-center py-10 text-gray-500">
-                            No payments found.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+    <!-- =============================== -->
+    <!-- SEARCH & FILTER SECTION -->
+    <!-- =============================== -->
+    <form method="GET"
+          action="{{ route('reception.payments.index') }}"
+          class="bg-white shadow-lg rounded-xl px-6 py-6 mb-10 border border-gray-200">
+
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Search & Filters</h2>
+
+        <div class="grid md:grid-cols-3 gap-6">
+
+            <!-- SEARCH STUDENT -->
+            <div>
+                <label class="text-sm text-gray-600 font-semibold mb-1 block">Search Student</label>
+                <input type="text" name="search" value="{{ request('search') }}"
+                       placeholder="Search by name or reg no..."
+                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 shadow-sm" />
+            </div>
+
+            <!-- FILTER COURSE -->
+            <div>
+                <label class="text-sm text-gray-600 font-semibold mb-1 block">Filter by Course</label>
+                <select name="course"
+                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 shadow-sm">
+                    <option value="">All Courses</option>
+                    @foreach ($courses as $course)
+                        <option value="{{ $course->id }}" {{ request('course') == $course->id ? 'selected' : '' }}>
+                            {{ $course->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- FILTER CENTER -->
+            <div>
+                <label class="text-sm text-gray-600 font-semibold mb-1 block">Filter by Center</label>
+                <select name="center"
+                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 shadow-sm">
+                    <option value="">All Centers</option>
+                    @foreach ($centers as $center)
+                        <option value="{{ $center->id }}" {{ request('center') == $center->id ? 'selected' : '' }}>
+                            {{ $center->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+        </div>
+
+        <div class="mt-6 flex justify-end">
+            <button class="bg-blue-600 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-blue-700 transition transform hover:scale-105">
+                Apply Filters
+            </button>
+        </div>
+
+    </form>
+
+    <!-- =============================== -->
+    <!-- GROUPED PAYMENT TABLE LIST -->
+    <!-- =============================== -->
+    <div class="bg-white shadow-xl rounded-xl overflow-hidden border border-gray-200">
+        <h2 class="text-xl font-bold bg-gray-100 px-6 py-4 border-b text-gray-700">
+            Monthly Payment Records
+        </h2>
+
+        @php
+            $grouped = $monthlyPayments->groupBy(fn($i) => $i->payment_date->format('Y-m-d'));
+        @endphp
+
+        @forelse($grouped as $date => $records)
+
+            <!-- DATE HEADER -->
+            <div class="bg-blue-50 border-l-4 border-blue-500 px-6 py-4 shadow-sm">
+                <h3 class="text-lg font-semibold text-blue-700 tracking-tight">
+                    Payments on {{ \Carbon\Carbon::parse($date)->format('F d, Y') }}
+                </h3>
+            </div>
+
+            <!-- TABLE -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full leading-normal mb-10 shadow-sm">
+                    <thead>
+                        <tr class="bg-gray-100 border-b">
+                            <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wide text-gray-600">Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wide text-gray-600">Reg No</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wide text-gray-600">Course</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wide text-gray-600">Center</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wide text-gray-600">Month</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wide text-gray-600">Amount</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wide text-gray-600">Time</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wide text-gray-600">Recorded By</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wide text-gray-600">Notes</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="bg-white">
+                        @foreach($records as $pay)
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="px-6 py-4 border-b">{{ $pay->student->name }}</td>
+                                <td class="px-6 py-4 border-b">{{ $pay->student->reg_no }}</td>
+                                <td class="px-6 py-4 border-b">{{ $pay->course->name }}</td>
+                                <td class="px-6 py-4 border-b">{{ $pay->student->center->name ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 border-b">Month {{ $pay->month_number }}</td>
+                                <td class="px-6 py-4 border-b font-semibold text-gray-800">
+                                    Rs. {{ number_format($pay->amount, 2) }}
+                                </td>
+                                <td class="px-6 py-4 border-b">{{ $pay->payment_date->format('h:i A') }}</td>
+                                <td class="px-6 py-4 border-b">{{ $pay->recordedBy->name ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 border-b">{{ $pay->notes ?? '-' }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+        @empty
+            <div class="text-center py-10 text-gray-500 text-lg">
+                No monthly payments recorded yet.
+            </div>
+        @endforelse
     </div>
 </div>
 @endsection

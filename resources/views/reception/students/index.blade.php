@@ -31,7 +31,13 @@
                         Email
                     </th>
                     <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Phone
+                        Student Phone
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Parent Phone
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Status
                     </th>
                     <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                         Actions
@@ -45,13 +51,22 @@
                             {{ $student->id }}
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ $student->name }}</p>
+                            <p class="text-gray-900 whitespace-no-wrap">{{ $student->first_name }} {{ $student->last_name }}</p>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <p class="text-gray-900 whitespace-no-wrap">{{ $student->email }}</p>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ $student->phone }}</p>
+                            <p class="text-gray-900 whitespace-no-wrap">{{ $student->student_phone }}</p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 whitespace-no-wrap">{{ $student->parent_phone }}</p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <span class="relative inline-block px-3 py-1 font-semibold leading-tight {{ $student->status === 'active' ? 'text-green-900' : 'text-red-900' }}">
+                                <span aria-hidden="true" class="absolute inset-0 {{ $student->status === 'active' ? 'bg-green-200' : 'bg-red-200' }} opacity-50 rounded-full"></span>
+                                <span class="relative">{{ ucfirst($student->status) }}</span>
+                            </span>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <a href="{{ route('reception.students.show', $student) }}" class="text-blue-600 hover:text-blue-900 mr-3">View</a>
@@ -65,13 +80,16 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="text-center py-10 text-gray-500">
+                        <td colspan="7" class="text-center py-10 text-gray-500">
                             No students found.
                         </td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
+        <div class="mt-4">
+            {{ $students->links() }}
+        </div>
     </div>
 </div>
 @endsection

@@ -45,7 +45,7 @@ class RegisteredUserController extends Controller
     if ($user->role === 'admin') {
         return redirect()->route('dashboard');
     } elseif ($user->role === 'receptionist') {
-        return redirect()->route('Reception');
+        return redirect()->route('reception.dashboard');
     }
 
     return redirect('/welcome'); // fallback

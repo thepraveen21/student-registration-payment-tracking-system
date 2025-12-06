@@ -36,7 +36,7 @@ class AdvancedReportController extends Controller
      */
     public function courseWiseStudents(Request $request)
     {
-        $courses = Course::withCount('students')->get();
+        $courses = Course::with('students')->withCount('students')->get();
         
         if ($request->has('export') && $request->export == 'pdf') {
             $pdf = PDF::loadView('admin.reports.pdf.course-wise-students', compact('courses'));

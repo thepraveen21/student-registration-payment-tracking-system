@@ -9,32 +9,29 @@ use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Schema;
+use App\Models\Schedule;
+use App\Models\Task;
 
 class ReceptionController extends Controller
 {
     public function dashboard()
     {
+        // Basic stats (your existing queries)
         $totalStudents = Student::count();
         $totalPayments = Payment::sum('amount');
 
-        // Today's registrations
         $todaysRegistrations = Student::whereDate('created_at', Carbon::today())->count();
 
-        // Pending payments (overdue and due today)
         $pendingPayments = PaymentSchedule::where('status', 'pending')
             ->orWhere('status', 'overdue')
             ->count();
 
-        // Overdue payments
         $overduePayments = PaymentSchedule::where('status', 'overdue')->count();
 
-        // Today's revenue
         $todaysRevenue = Payment::whereDate('payment_date', Carbon::today())->sum('amount');
-
-        // Yesterday's revenue for comparison
         $yesterdaysRevenue = Payment::whereDate('payment_date', Carbon::yesterday())->sum('amount');
 
-        // Students registered this week
         $weeklyNewStudents = Student::whereBetween('created_at', [
             Carbon::now()->startOfWeek(),
             Carbon::now()->endOfWeek()
@@ -55,21 +52,32 @@ class ReceptionController extends Controller
 
         $recentPayments = Payment::with('student')->latest()->take(5)->get();
 
-        // Recent activities from audit logs
-        $recentActivities = AuditLog::with('user')
-            ->latest()
-            ->take(4)
-            ->get();
+        $recentActivities = AuditLog::with('user')->latest()->take(4)->get();
 
-        // Overdue payment schedules for pending tasks
-        $overduePaymentSchedules = PaymentSchedule::with('student')
-            ->where('status', 'overdue')
-            ->count();
+        $overduePaymentSchedules = PaymentSchedule::with('student')->where('status', 'overdue')->count();
 
-        // Students that need record verification (created in last week but no payments)
         $studentsNeedingVerification = Student::whereDoesntHave('payments')
             ->whereBetween('created_at', [Carbon::now()->subWeek(), Carbon::now()])
             ->count();
+
+        // --- SAFE: todaySchedules & pendingTasks (won't crash if tables/models not present) ---
+        $todaySchedules = collect();
+        if (Schema::hasTable('schedules')) {
+            if (class_exists(Schedule::class)) {
+                $todaySchedules = Schedule::whereDate('date', now()->toDateString())->get();
+            } else {
+                $todaySchedules = DB::table('schedules')->whereDate('date', now()->toDateString())->get();
+            }
+        }
+
+        $pendingTasks = collect();
+        if (Schema::hasTable('tasks')) {
+            if (class_exists(Task::class)) {
+                $pendingTasks = Task::where('status', 'pending')->get();
+            } else {
+                $pendingTasks = DB::table('tasks')->where('status', 'pending')->get();
+            }
+        }
 
         return view('reception.dashboard', compact(
             'totalStudents',
@@ -84,7 +92,9 @@ class ReceptionController extends Controller
             'recentPayments',
             'recentActivities',
             'overduePaymentSchedules',
-            'studentsNeedingVerification'
+            'studentsNeedingVerification',
+            'todaySchedules',
+            'pendingTasks'
         ));
     }
 
@@ -100,7 +110,7 @@ class ReceptionController extends Controller
             $query->whereDate('payment_date', '<=', $request->get('end_date'));
         }
 
-        $payments = $query->latest()->get();
+        $payments = $query->orderBy('id', 'asc')->paginate(10);
 
         return view('reception.reports.index', compact('payments'));
     }
@@ -108,5 +118,33 @@ class ReceptionController extends Controller
     public function settings()
     {
         return view('reception.settings');
+    }
+
+    /**
+     * Schedule page (list all schedules)
+     */
+    public function schedule()
+    {
+        // All schedules (not just today) for the schedule page
+        $schedules = collect();
+        if (Schema::hasTable('schedules')) {
+            if (class_exists(Schedule::class)) {
+                $schedules = Schedule::orderBy('date')->get();
+            } else {
+                $schedules = DB::table('schedules')->orderBy('date')->get();
+            }
+        }
+
+        // pending tasks for schedule page
+        $pendingTasks = collect();
+        if (Schema::hasTable('tasks')) {
+            if (class_exists(Task::class)) {
+                $pendingTasks = Task::where('status', 'pending')->get();
+            } else {
+                $pendingTasks = DB::table('tasks')->where('status', 'pending')->get();
+            }
+        }
+
+        return view('reception.schedule.index', compact('schedules', 'pendingTasks'));
     }
 }

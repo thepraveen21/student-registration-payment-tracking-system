@@ -18,11 +18,28 @@ class CourseController extends Controller
     }
 
     /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('courses.create');
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255|unique:courses,name',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'duration' => 'required|string|max:255',
+        ]);
+
+        Course::create($request->all());
+
+        return redirect()->route('reception.dashboard')->with('success', 'Course created successfully.');
     }
 
     /**

@@ -7,6 +7,12 @@
     <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-8">
         <h1 class="text-2xl font-semibold mb-6">Add New Student</h1>
 
+        @if (session('error'))
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                {{ session('error') }}
+            </div>
+        @endif
+
         @if ($errors->any())
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
                 <ul>
@@ -68,6 +74,18 @@
                     </select>
                 </div>
                 <div>
+                    <label for="center_id" class="block text-sm font-medium text-gray-700 mb-2">Center</label>
+                    <select name="center_id" id="center_id" 
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        <option value="">Select a Center</option>
+                        @foreach($centers as $center)
+                            <option value="{{ $center->id }}" {{ old('center_id') == $center->id ? 'selected' : '' }}>
+                                {{ $center->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
                     <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                     <select name="status" id="status" 
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
@@ -75,6 +93,15 @@
                         <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                     </select>
                 </div>
+            </div>
+
+            {{-- ✅ QR Scanner Section --}}
+            <div class="mt-6">
+                <h3 class="text-lg font-medium mb-2">Scan QR Code</h3>
+                <div id="qr-reader" style="width:300px;"></div>
+                <input type="text" name="qr_code" id="qr_code" placeholder="QR Code will appear here" 
+                       class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" 
+                       required readonly>
             </div>
             
             <div class="flex items-center justify-between mt-6">
@@ -89,3 +116,33 @@
     </div>
 </div>
 @endsection
+
+{{-- ✅ Push scripts for QR scanner --}}
+@push('scripts')
+<script>
+function onScanSuccess(decodedText, decodedResult) {
+    // Normalize scanned value: if scanner returns a full URL, extract the
+    // last path segment (the actual QR code). Otherwise use the decodedText.
+    let code = decodedText;
+    try {
+        const url = new URL(decodedText);
+        const segments = url.pathname.split('/').filter(Boolean);
+        if (segments.length) {
+            code = segments.pop();
+        }
+    } catch (e) {
+        // not a URL, try splitting by slash just in case
+        if (decodedText.indexOf('/') !== -1) {
+            const segs = decodedText.split('/').filter(s => s.length);
+            code = segs.pop();
+        }
+    }
+    document.getElementById('qr_code').value = code;
+    html5QrcodeScanner.clear(); // stop scanning after success
+}
+
+const html5QrcodeScanner = new Html5QrcodeScanner(
+    "qr-reader", { fps: 10, qrbox: 250 });
+html5QrcodeScanner.render(onScanSuccess);
+</script>
+@endpush

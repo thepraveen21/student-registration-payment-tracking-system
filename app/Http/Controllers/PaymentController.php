@@ -10,7 +10,7 @@ class PaymentController extends Controller
 {
     public function index()
     {
-        $payments = Payment::with('student')->latest()->paginate(10);
+        $payments = Payment::with('student')->orderBy('id', 'asc')->paginate(10);
         return view('admin.payments.index', compact('payments'));
     }
 

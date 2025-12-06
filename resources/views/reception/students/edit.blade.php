@@ -77,7 +77,19 @@
                     </select>
                 </div>
             </div>
-            
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Center</label>
+                <select name="center_id" class="block w-full border rounded px-3 py-2">
+                    <option value="">Select Center</option>
+                    @foreach($centers as $center)
+                        <option value="{{ $center->id }}" {{ old('center_id', $student->center_id ?? '') == $center->id ? 'selected' : '' }}>
+                            {{ $center->name }} - {{ $center->location }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
             <div class="flex items-center justify-between mt-6">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                     Update Student
