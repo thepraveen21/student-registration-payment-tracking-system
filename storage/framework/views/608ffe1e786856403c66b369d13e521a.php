@@ -130,51 +130,51 @@
                     <th class="col-name">Student Name</th>
                     <th class="col-course">Course</th>
                     <th class="col-center">Center</th>
-                    @for($m = 1; $m <= 4; $m++)
-                        <th class="col-week week-cell">M{{ $m }}</th>
-                    @endfor
-                    @for($w = 1; $w <= 16; $w++)
-                        <th class="col-week week-cell">W{{ $w }}</th>
-                    @endfor
+                    <?php for($m = 1; $m <= 4; $m++): ?>
+                        <th class="col-week week-cell">M<?php echo e($m); ?></th>
+                    <?php endfor; ?>
+                    <?php for($w = 1; $w <= 16; $w++): ?>
+                        <th class="col-week week-cell">W<?php echo e($w); ?></th>
+                    <?php endfor; ?>
                     <th class="col-percent">Presence %</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($students as $student)
+                <?php $__currentLoopData = $students; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $student): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        <td class="col-name">{{ $student->name }}</td>
-                        <td class="col-course">{{ $student->course->name ?? 'N/A' }}</td>
-                        <td class="col-center">{{ $student->center->name ?? 'N/A' }}</td>
-                        @php
+                        <td class="col-name"><?php echo e($student->name); ?></td>
+                        <td class="col-course"><?php echo e($student->course->name ?? 'N/A'); ?></td>
+                        <td class="col-center"><?php echo e($student->center->name ?? 'N/A'); ?></td>
+                        <?php
                             $paymentStatus = $stats[$student->id]['payment_status'] ?? [];
-                        @endphp
-                        @for($m = 1; $m <= 4; $m++)
+                        ?>
+                        <?php for($m = 1; $m <= 4; $m++): ?>
                             <td class="col-week week-cell text-center">
-                                @if(($paymentStatus[$m] ?? 'Unpaid') == 'Paid')
+                                <?php if(($paymentStatus[$m] ?? 'Unpaid') == 'Paid'): ?>
                                     <span class="present">P</span>
-                                @else
+                                <?php else: ?>
                                     <span class="absent">A</span>
-                                @endif
+                                <?php endif; ?>
                             </td>
-                        @endfor
-                        @php
+                        <?php endfor; ?>
+                        <?php
                             $row = $attendanceMatrix[$student->id] ?? [];
-                        @endphp
-                        @for($i = 0; $i < 16; $i++)
-                            @php
+                        ?>
+                        <?php for($i = 0; $i < 16; $i++): ?>
+                            <?php
                                 $attended = $row[$i]['attended'] ?? false;
-                            @endphp
+                            ?>
                             <td class="col-week week-cell text-center">
-                                @if($attended)
+                                <?php if($attended): ?>
                                     <span class="present">P</span>
-                                @else
+                                <?php else: ?>
                                     <span class="absent">A</span>
-                                @endif
+                                <?php endif; ?>
                             </td>
-                        @endfor
-                        <td class="col-percent text-center">{{ ($stats[$student->id]['percent'] ?? 0) . '%' }}</td>
+                        <?php endfor; ?>
+                        <td class="col-percent text-center"><?php echo e(($stats[$student->id]['percent'] ?? 0) . '%'); ?></td>
                     </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
         </table>
     </div>
@@ -183,13 +183,13 @@
 
     <h1>Monthly Payment Report</h1>
     
-    @forelse($paymentReports as $month => $payments)
-        @php
+    <?php $__empty_1 = true; $__currentLoopData = $paymentReports; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $month => $payments): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+        <?php
             $monthLabel = \Carbon\Carbon::createFromFormat('Y-m', $month)->format('F Y');
             $monthTotal = $payments->sum('amount');
-        @endphp
+        ?>
         
-        <h2>{{ $monthLabel }} - Total: Rs. {{ number_format($monthTotal, 2) }}</h2>
+        <h2><?php echo e($monthLabel); ?> - Total: Rs. <?php echo e(number_format($monthTotal, 2)); ?></h2>
         
         <div class="table-container">
             <table>
@@ -201,22 +201,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($payments as $row)
+                    <?php $__currentLoopData = $payments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <tr class="payment-row">
-                            <td>{{ $row->first_name }} {{ $row->last_name }}</td>
-                            <td>{{ $row->center_name ?? 'N/A' }}</td>
-                            <td class="text-right">{{ number_format($row->amount, 2) }}</td>
+                            <td><?php echo e($row->first_name); ?> <?php echo e($row->last_name); ?></td>
+                            <td><?php echo e($row->center_name ?? 'N/A'); ?></td>
+                            <td class="text-right"><?php echo e(number_format($row->amount, 2)); ?></td>
                         </tr>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>
             </table>
         </div>
         
-        @if(!$loop->last)
+        <?php if(!$loop->last): ?>
             <div style="margin-bottom: 20px;"></div>
-        @endif
-    @empty
+        <?php endif; ?>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
         <p>No payment records found.</p>
-    @endforelse
+    <?php endif; ?>
 </body>
-</html>
+</html><?php /**PATH E:\Project\Student Management System\resources\views/reception/reports/pdf.blade.php ENDPATH**/ ?>

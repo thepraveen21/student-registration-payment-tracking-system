@@ -113,10 +113,18 @@ class ReportController extends Controller
             $totalWeeks = 16;
             $percent = $totalWeeks ? round(($presentWeeks / $totalWeeks) * 100, 2) : 0;
 
+            // Get payment status for each of the 4 months
+            $monthlyPayments = $student->monthlyPayments->keyBy('month_number');
+            $paymentStatus = [];
+            for ($m = 1; $m <= 4; $m++) {
+                $paymentStatus[$m] = $monthlyPayments->has($m) ? 'Paid' : 'Unpaid';
+            }
+
             $stats[$student->id] = [
                 'present_weeks' => $presentWeeks,
                 'absent_weeks' => $totalWeeks - $presentWeeks,
                 'percent' => $percent,
+                'payment_status' => $paymentStatus,
             ];
         }
 
@@ -207,9 +215,18 @@ class ReportController extends Controller
             }
 
             $attendanceMatrix[$student->id] = $row;
+
+            // Get payment status for each of the 4 months
+            $monthlyPayments = $student->monthlyPayments->keyBy('month_number');
+            $paymentStatus = [];
+            for ($m = 1; $m <= 4; $m++) {
+                $paymentStatus[$m] = $monthlyPayments->has($m) ? 'Paid' : 'Unpaid';
+            }
+
             $stats[$student->id] = [
                 'present_weeks' => $presentWeeks,
                 'percent' => 16 ? round(($presentWeeks / 16) * 100, 2) : 0,
+                'payment_status' => $paymentStatus,
             ];
         }
 

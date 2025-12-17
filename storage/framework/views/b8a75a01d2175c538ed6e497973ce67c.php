@@ -1,9 +1,7 @@
-@extends('layouts.reception')
+<?php $__env->startSection('header', 'Attendance Matrix'); ?>
+<?php $__env->startSection('title', 'Attendance Matrix'); ?>
 
-@section('header', 'Attendance Matrix')
-@section('title', 'Attendance Matrix')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
     <!-- Header Section -->
     <div class="mb-6 md:mb-8">
@@ -13,7 +11,7 @@
                 <p class="mt-1 md:mt-2 text-sm text-gray-600">4 months / 16 weeks attendance overview</p>
             </div>
             <div class="mt-4 sm:mt-0">
-                <a href="{{ route('reception.reports.export', ['course_id' => request('course_id')]) }}" class="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5">
+                <a href="<?php echo e(route('reception.reports.export', ['course_id' => request('course_id')])); ?>" class="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                     </svg>
@@ -31,11 +29,12 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">Course Filter</label>
                     <select name="course_id" class="appearance-none w-full bg-white border border-gray-300 rounded-lg py-2.5 px-4 pr-10 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
                         <option value="">All Courses</option>
-                        @foreach($courses as $c)
-                            <option value="{{ $c->id }}" {{ request('course_id') == $c->id ? 'selected' : '' }}>
-                                {{ $c->name }}
+                        <?php $__currentLoopData = $courses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $c): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($c->id); ?>" <?php echo e(request('course_id') == $c->id ? 'selected' : ''); ?>>
+                                <?php echo e($c->name); ?>
+
                             </option>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 top-6 flex items-center px-2 text-gray-700">
                         <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -99,14 +98,14 @@
                             Payment Status
                         </th>
                         
-                        @for($m = 1; $m <= 4; $m++)
+                        <?php for($m = 1; $m <= 4; $m++): ?>
                             <th colspan="4" class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider border-l">
                                 <div class="flex flex-col items-center">
-                                    <span class="font-bold text-gray-700">Month {{ $m }}</span>
-                                    <span class="text-xs text-gray-500 font-normal mt-1">Weeks {{ (($m-1)*4)+1 }}-{{ $m*4 }}</span>
+                                    <span class="font-bold text-gray-700">Month <?php echo e($m); ?></span>
+                                    <span class="text-xs text-gray-500 font-normal mt-1">Weeks <?php echo e((($m-1)*4)+1); ?>-<?php echo e($m*4); ?></span>
                                 </div>
                             </th>
-                        @endfor
+                        <?php endfor; ?>
                         
                         <th scope="col" rowspan="2" class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider border-l">
                             Presence %
@@ -115,37 +114,40 @@
                     
                     <!-- Second Header: Week Labels -->
                     <tr class="bg-gray-100">
-                        @for($m = 1; $m <= 4; $m++)
+                        <?php for($m = 1; $m <= 4; $m++): ?>
                             <th class="px-3 py-2 text-center text-xs font-medium text-gray-600 border-l">
-                                M{{ $m }}
-                            </th>
-                        @endfor
+                                M<?php echo e($m); ?>
 
-                        @for($w = 1; $w <= 16; $w++)
+                            </th>
+                        <?php endfor; ?>
+
+                        <?php for($w = 1; $w <= 16; $w++): ?>
                             <th class="px-3 py-2 text-center text-xs font-medium text-gray-600 border-l">
                                 <div class="flex flex-col items-center">
-                                    <span class="font-semibold">W{{ $w }}</span>
+                                    <span class="font-semibold">W<?php echo e($w); ?></span>
                                 </div>
                             </th>
-                        @endfor
+                        <?php endfor; ?>
                         <th class="px-4 py-2"></th>
                     </tr>
                 </thead>
                 
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse($students as $student)
+                    <?php $__empty_1 = true; $__currentLoopData = $students; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $student): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <tr class="hover:bg-gray-50 transition-colors duration-150">
                         <!-- Student Info -->
                         <td class="px-4 py-3 whitespace-nowrap sticky left-0 bg-white z-10 border-r">
                             <div class="flex items-center min-w-[150px]">
                                 <div class="flex-shrink-0 h-8 w-8 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center">
                                     <span class="text-blue-600 font-semibold text-xs">
-                                        {{ substr($student->name, 0, 2) }}
+                                        <?php echo e(substr($student->name, 0, 2)); ?>
+
                                     </span>
                                 </div>
                                 <div class="ml-3">
                                     <div class="text-sm font-medium text-gray-900">
-                                        {{ $student->name }}
+                                        <?php echo e($student->name); ?>
+
                                     </div>
                                 </div>
                             </div>
@@ -153,33 +155,34 @@
                         
                         <!-- Course Info -->
                         <td class="px-4 py-3 whitespace-nowrap sticky left-[150px] bg-white z-10 border-r">
-                            <div class="text-sm text-gray-900 min-w-[120px]">{{ $student->course->name ?? '-' }}</div>
+                            <div class="text-sm text-gray-900 min-w-[120px]"><?php echo e($student->course->name ?? '-'); ?></div>
                         </td>
                         
                         <!-- Center Info -->
                         <td class="px-4 py-3 whitespace-nowrap sticky left-[270px] bg-white z-10 border-r">
-                            <div class="text-sm text-gray-900 min-w-[120px]">{{ $student->center->name ?? '-' }}</div>
+                            <div class="text-sm text-gray-900 min-w-[120px]"><?php echo e($student->center->name ?? '-'); ?></div>
                         </td>
                         
                         <!-- Payment Status -->
-                        @php
+                        <?php
                             $paymentStatus = $stats[$student->id]['payment_status'] ?? [];
-                        @endphp
-                        @for($m = 1; $m <= 4; $m++)
+                        ?>
+                        <?php for($m = 1; $m <= 4; $m++): ?>
                             <td class="px-3 py-3 text-center border-l">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ ($paymentStatus[$m] ?? 'Unpaid') == 'Paid' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                    {{ $paymentStatus[$m] ?? 'Unpaid' }}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo e(($paymentStatus[$m] ?? 'Unpaid') == 'Paid' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'); ?>">
+                                    <?php echo e($paymentStatus[$m] ?? 'Unpaid'); ?>
+
                                 </span>
                             </td>
-                        @endfor
+                        <?php endfor; ?>
 
                         <!-- 16 Week Boxes -->
-                        @php
+                        <?php
                             $row = $attendanceMatrix[$student->id] ?? [];
-                        @endphp
+                        ?>
 
-                        @for($i = 0; $i < 16; $i++)
-                            @php
+                        <?php for($i = 0; $i < 16; $i++): ?>
+                            <?php
                                 $cell = $row[$i] ?? null;
                                 $attended = $cell['attended'] ?? false;
                                 $count = $cell['count'] ?? 0;
@@ -189,40 +192,41 @@
                                 if($start && $end) $title .= "Period: $start to $end\\n";
                                 $title .= "Attendances: $count\\n";
                                 $title .= "Status: ".($attended ? 'Attended' : 'Absent');
-                            @endphp
+                            ?>
 
                             <td class="px-3 py-3 text-center border-l group relative">
                                 <div class="w-6 h-6 mx-auto rounded-lg shadow-sm cursor-help hover:shadow-md transition-shadow duration-200"
-                                     style="background-color: {{ $attended ? '#16a34a' : '#ef4444' }};"
-                                     data-tooltip="{{ $title }}">
+                                     style="background-color: <?php echo e($attended ? '#16a34a' : '#ef4444'); ?>;"
+                                     data-tooltip="<?php echo e($title); ?>">
                                 </div>
                                 <!-- Tooltip -->
                                 <div class="absolute z-50 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-200 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg whitespace-pre-line">
-                                    {{ str_replace('\\n', "\n", $title) }}
+                                    <?php echo e(str_replace('\\n', "\n", $title)); ?>
+
                                     <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
                                         <div class="w-2 h-2 bg-gray-900 rotate-45"></div>
                                     </div>
                                 </div>
                             </td>
-                        @endfor
+                        <?php endfor; ?>
                         
                         <!-- Percentage -->
-                        @php
+                        <?php
                             $st = $stats[$student->id] ?? ['percent' => 0];
                             $percent = $st['percent'] ?? 0;
-                        @endphp
+                        ?>
                         <td class="px-4 py-3 whitespace-nowrap text-center border-l">
                             <div class="flex items-center justify-center space-x-2">
                                 <div class="w-20 bg-gray-200 rounded-full h-2">
-                                    <div class="bg-green-600 h-2 rounded-full" style="width: {{ min($percent, 100) }}%"></div>
+                                    <div class="bg-green-600 h-2 rounded-full" style="width: <?php echo e(min($percent, 100)); ?>%"></div>
                                 </div>
-                                <span class="text-sm font-semibold {{ $percent >= 75 ? 'text-green-600' : ($percent >= 50 ? 'text-yellow-600' : 'text-red-600') }}">
-                                    {{ $percent }}%
+                                <span class="text-sm font-semibold <?php echo e($percent >= 75 ? 'text-green-600' : ($percent >= 50 ? 'text-yellow-600' : 'text-red-600')); ?>">
+                                    <?php echo e($percent); ?>%
                                 </span>
                             </div>
                         </td>
                     </tr>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                     <tr>
                         <td colspan="20" class="px-6 py-12 text-center">
                             <div class="flex flex-col items-center justify-center">
@@ -234,7 +238,7 @@
                             </div>
                         </td>
                     </tr>
-                    @endforelse
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -252,20 +256,20 @@
         </div>
         
         <div class="divide-y divide-gray-200">
-            @forelse($paymentReports as $month => $payments)
-                @php
+            <?php $__empty_1 = true; $__currentLoopData = $paymentReports; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $month => $payments): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                <?php
                     $monthLabel = \Carbon\Carbon::createFromFormat('Y-m', $month)->format('F Y');
                     $monthTotal = $payments->sum('amount');
-                @endphp
+                ?>
                 
                 <div class="p-6 hover:bg-gray-50 transition-colors duration-150">
                     <div class="flex items-center justify-between mb-4">
                         <div>
-                            <h3 class="text-base font-semibold text-gray-900">{{ $monthLabel }}</h3>
-                            <p class="text-sm text-gray-600 mt-1">{{ $payments->count() }} payment records</p>
+                            <h3 class="text-base font-semibold text-gray-900"><?php echo e($monthLabel); ?></h3>
+                            <p class="text-sm text-gray-600 mt-1"><?php echo e($payments->count()); ?> payment records</p>
                         </div>
                         <div class="text-right">
-                            <div class="text-lg font-bold text-gray-900">Rs. {{ number_format($monthTotal, 2) }}</div>
+                            <div class="text-lg font-bold text-gray-900">Rs. <?php echo e(number_format($monthTotal, 2)); ?></div>
                             <div class="text-sm text-gray-600">Total amount</div>
                         </div>
                     </div>
@@ -286,25 +290,28 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach($payments as $row)
+                                <?php $__currentLoopData = $payments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-4 py-3 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-900">
-                                            {{ $row->first_name }} {{ $row->last_name }}
+                                            <?php echo e($row->first_name); ?> <?php echo e($row->last_name); ?>
+
                                         </div>
                                     </td>
                                     <td class="px-4 py-3 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">
-                                            {{ $row->center_name ?? 'N/A' }}
+                                            <?php echo e($row->center_name ?? 'N/A'); ?>
+
                                         </div>
                                     </td>
                                     <td class="px-4 py-3 whitespace-nowrap text-right">
                                         <div class="text-sm font-medium text-gray-900">
-                                            {{ number_format($row->amount, 2) }}
+                                            <?php echo e(number_format($row->amount, 2)); ?>
+
                                         </div>
                                     </td>
                                 </tr>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 
                                 <!-- Month Total Row -->
                                 <tr class="bg-gradient-to-r from-gray-50 to-gray-100">
@@ -313,7 +320,8 @@
                                     </td>
                                     <td class="px-4 py-3 whitespace-nowrap text-right">
                                         <div class="text-lg font-bold text-gray-900">
-                                            Rs. {{ number_format($monthTotal, 2) }}
+                                            Rs. <?php echo e(number_format($monthTotal, 2)); ?>
+
                                         </div>
                                     </td>
                                 </tr>
@@ -321,7 +329,7 @@
                         </table>
                     </div>
                 </div>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <div class="p-12 text-center">
                 <div class="flex flex-col items-center justify-center">
                     <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -331,7 +339,7 @@
                     <p class="text-gray-400 mt-1">Monthly payment data will appear here when available.</p>
                 </div>
             </div>
-            @endforelse
+            <?php endif; ?>
         </div>
     </div>
 </div>
@@ -571,4 +579,5 @@
         }, 100);
     });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.reception', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\Project\Student Management System\resources\views/reception/reports/index.blade.php ENDPATH**/ ?>

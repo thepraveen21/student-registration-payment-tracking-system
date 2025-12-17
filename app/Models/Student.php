@@ -21,6 +21,7 @@ class Student extends Model
         'parent_phone',
         'date_of_birth',
         'address',
+        'status',
         'qr_code_path', 
     ];
 

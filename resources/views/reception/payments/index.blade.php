@@ -205,10 +205,10 @@
         </div>
 
         @php
-            $grouped = $monthlyPayments->groupBy(fn($i) => $i->payment_date->format('Y-m-d H'));
+            $grouped = $monthlyPayments->groupBy(fn($i) => $i->payment_date->format('Y-m-d'));
         @endphp
 
-        @forelse($grouped as $hour => $records)
+        @forelse($grouped as $date => $records)
             <!-- Date Group Header - LARGER DATE/TIME ONLY -->
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-blue-100">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between">
@@ -221,13 +221,9 @@
                         <div>
                             <!-- LARGER DATE -->
                             <h4 class="text-xl font-bold text-gray-900">
-                                {{ \Carbon\Carbon::parse($hour . ':00:00')->format('F d, Y') }}
+                                {{ \Carbon\Carbon::parse($date)->format('F d, Y') }}
                             </h4>
                             <div class="flex items-center mt-1">
-                                <!-- LARGER TIME -->
-                                <span class="text-lg font-bold text-blue-700 mr-3">
-                                    {{ \Carbon\Carbon::parse($hour . ':00:00')->format('h:00 A') }}
-                                </span>
                                 <span class="text-sm text-gray-600">
                                     {{ count($records) }} payment{{ count($records) > 1 ? 's' : '' }} • 
                                     Total: Rs. {{ number_format($records->sum('amount'), 2) }}
@@ -300,7 +296,7 @@
                                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</p>
                                         <p class="text-lg font-bold text-green-700 mt-1">Rs. {{ number_format($pay->amount, 2) }}</p>
                                     </div>
-                                    <!-- LARGER PAYMENT TIME -->
+                                    <!-- PAYMENT TIME -->
                                     <div>
                                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Time</p>
                                         <p class="text-lg font-bold text-gray-900 mt-1 flex items-center">
