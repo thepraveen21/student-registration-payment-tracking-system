@@ -78,6 +78,20 @@
             font-weight: bold;
         }
         
+        /* MODIFICATION START - Payment status styling */
+        .payment-paid { 
+            color: green; 
+            font-weight: bold;
+            background-color: #e8f5e9;
+        }
+        
+        .payment-unpaid { 
+            color: red; 
+            font-weight: bold;
+            background-color: #ffebee;
+        }
+        /* MODIFICATION END */
+        
         /* Page break handling */
         .page-break { 
             page-break-before: always; 
@@ -149,13 +163,19 @@
                             $paymentStatus = $stats[$student->id]['payment_status'] ?? [];
                         @endphp
                         @for($m = 1; $m <= 4; $m++)
-                            <td class="col-week week-cell text-center">
-                                @if(($paymentStatus[$m] ?? 'Unpaid') == 'Paid')
-                                    <span class="present">P</span>
+                            @php
+                                $status = $paymentStatus[$m] ?? 'Unpaid';
+                            @endphp
+                            <!-- MODIFICATION START - Payment status columns -->
+                            <td class="col-week week-cell text-center 
+                                @if($status == 'Paid') payment-paid @else payment-unpaid @endif">
+                                @if($status == 'Paid')
+                                    P
                                 @else
-                                    <span class="absent">A</span>
+                                    UP
                                 @endif
                             </td>
+                            <!-- MODIFICATION END -->
                         @endfor
                         @php
                             $row = $attendanceMatrix[$student->id] ?? [];
