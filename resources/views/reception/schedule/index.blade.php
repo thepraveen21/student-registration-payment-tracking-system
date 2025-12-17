@@ -4,18 +4,18 @@
 @section('title', 'Reception Schedule')
 
 @section('content')
-<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+<div class="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 md:py-6 lg:py-8">
     <!-- Header Section -->
-    <div class="mb-6 md:mb-8">
+    <div class="mb-4 md:mb-6 lg:mb-8">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Reception Schedule</h1>
-                <p class="mt-1 md:mt-2 text-sm text-gray-600">Manage all scheduled events and pending tasks</p>
+            <div class="mb-3 sm:mb-0">
+                <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">Reception Schedule</h1>
+                <p class="mt-1 text-xs md:text-sm text-gray-600">Manage all scheduled events and pending tasks</p>
             </div>
-            <div class="mt-4 sm:mt-0">
+            <div class="mt-3 sm:mt-0">
                 <button type="button" id="add-schedule-btn"
-                        class="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="inline-flex items-center px-3 py-2 md:px-4 md:py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 text-sm md:text-base">
+                    <svg class="w-4 h-4 md:w-5 md:h-5 mr-1.5 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
                     Add New Schedule
@@ -25,55 +25,55 @@
     </div>
 
     <!-- Events Section -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Events</h3>
-                    <p class="text-sm text-gray-600 mt-1">Upcoming and scheduled events</p>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-4 md:mb-6 overflow-hidden">
+        <div class="px-4 md:px-6 py-3 md:py-4 border-b border-gray-200">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div class="mb-3 sm:mb-0">
+                    <h3 class="text-base md:text-lg font-semibold text-gray-900">Events</h3>
+                    <p class="text-xs md:text-sm text-gray-600 mt-0.5">Upcoming and scheduled events</p>
                 </div>
-                <div class="flex space-x-2">
-                    <button type="button" class="filter-button px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200" data-filter="all">All Events</button>
-                    <button type="button" class="filter-button px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200" data-filter="upcoming">Upcoming</button>
-                    <button type="button" class="filter-button px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200" data-filter="scheduled">Scheduled</button>
+                <div class="flex space-x-1 md:space-x-2 overflow-x-auto pb-1">
+                    <button type="button" class="filter-button px-2 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors duration-200 whitespace-nowrap" data-filter="all">All Events</button>
+                    <button type="button" class="filter-button px-2 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors duration-200 whitespace-nowrap" data-filter="upcoming">Upcoming</button>
+                    <button type="button" class="filter-button px-2 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors duration-200 whitespace-nowrap" data-filter="scheduled">Scheduled</button>
                 </div>
             </div>
         </div>
         
         <div class="divide-y divide-gray-200">
             @forelse($schedules as $schedule)
-            <div class="px-6 py-4 hover:bg-gray-50 transition-colors duration-150">
+            <div class="px-3 md:px-6 py-3 md:py-4 hover:bg-gray-50 transition-colors duration-150">
                 <div class="flex items-start justify-between">
-                    <div class="flex items-start space-x-4">
-                        <div class="flex-shrink-0 mt-1">
-                            <div class="w-3 h-3 rounded-full 
+                    <div class="flex items-start space-x-2 md:space-x-4 flex-grow overflow-hidden">
+                        <div class="flex-shrink-0 mt-0.5 md:mt-1">
+                            <div class="w-2 h-2 md:w-3 md:h-3 rounded-full 
                                 {{ (strtolower($schedule->status ?? $schedule['status']) == 'upcoming') ? 'bg-blue-500' : ((strtolower($schedule->status ?? $schedule['status']) == 'scheduled') ? 'bg-green-500' : 'bg-gray-400') }}">
                             </div>
                         </div>
-                        <div class="flex-grow">
-                            <div class="flex items-center space-x-3">
-                                <h4 class="text-sm font-medium text-gray-900">{{ $schedule->title ?? $schedule['title'] }}</h4>
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                        <div class="flex-grow overflow-hidden min-w-0">
+                            <div class="flex flex-col md:flex-row md:items-center md:space-x-3">
+                                <h4 class="text-sm font-medium text-gray-900 truncate">{{ $schedule->title ?? $schedule['title'] }}</h4>
+                                <span class="inline-flex items-center px-1.5 py-0.5 md:px-2.5 md:py-0.5 rounded-full text-xs font-medium mt-1 md:mt-0 
                                     {{ (strtolower($schedule->status ?? $schedule['status']) == 'upcoming') ? 'bg-blue-100 text-blue-800' : ((strtolower($schedule->status ?? $schedule['status']) == 'scheduled') ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800') }}">
                                     {{ ucfirst($schedule->status ?? $schedule['status']) }}
                                 </span>
                             </div>
-                            <div class="mt-2 flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                            <div class="mt-1.5 md:mt-2 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-1.5 md:gap-4 text-xs md:text-sm text-gray-500">
                                 <div class="flex items-center">
-                                    <svg class="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-1.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
                                     {{ \Carbon\Carbon::parse($schedule->time ?? $schedule['time'])->format('h:i A') }}
                                 </div>
                                 <div class="flex items-center">
-                                    <svg class="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-1.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                                     </svg>
-                                    {{ $schedule->location ?? $schedule['location'] }}
+                                    <span class="truncate">{{ $schedule->location ?? $schedule['location'] }}</span>
                                 </div>
                                 <div class="flex items-center">
-                                    <svg class="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-1.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                     </svg>
                                     {{ \Illuminate\Support\Str::limit($schedule->date ?? ($schedule['date'] ?? ''), 10) }}
@@ -81,17 +81,17 @@
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <a href="{{ route('reception.schedule.edit', $schedule) }}" class="inline-flex items-center p-1.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex items-center space-x-1 md:space-x-2 ml-2 flex-shrink-0">
+                        <a href="{{ route('reception.schedule.edit', $schedule) }}" class="inline-flex items-center p-1 md:p-1.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                            <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                             </svg>
                         </a>
                         <form action="{{ route('reception.schedule.destroy', $schedule) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this event?');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="inline-flex items-center p-1.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <button type="submit" class="inline-flex items-center p-1 md:p-1.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                                <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                 </svg>
                             </button>
@@ -100,13 +100,13 @@
                 </div>
             </div>
             @empty
-            <div class="px-6 py-12 text-center">
+            <div class="px-4 md:px-6 py-8 md:py-12 text-center">
                 <div class="flex flex-col items-center justify-center">
-                    <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-12 h-12 md:w-16 md:h-16 text-gray-300 mb-3 md:mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
-                    <p class="text-gray-500 text-lg font-medium">No events scheduled</p>
-                    <p class="text-gray-400 mt-1">Add new events to get started</p>
+                    <p class="text-gray-500 text-base md:text-lg font-medium">No events scheduled</p>
+                    <p class="text-gray-400 mt-1 text-xs md:text-sm">Add new events to get started</p>
                 </div>
             </div>
             @endforelse
@@ -115,55 +115,55 @@
 
     <!-- Pending Tasks Section -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Pending Tasks</h3>
-                    <p class="text-sm text-gray-600 mt-1">Tasks that require your attention</p>
+        <div class="px-4 md:px-6 py-3 md:py-4 border-b border-gray-200">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div class="mb-3 sm:mb-0">
+                    <h3 class="text-base md:text-lg font-semibold text-gray-900">Pending Tasks</h3>
+                    <p class="text-xs md:text-sm text-gray-600 mt-0.5">Tasks that require your attention</p>
                 </div>
-                <div class="flex space-x-2">
-                    <button type="button" class="task-filter-button px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200" data-filter="all">All Tasks</button>
-                    <button type="button" class="task-filter-button px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200" data-filter="urgent">Urgent</button>
-                    <button type="button" class="task-filter-button px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200" data-filter="today">Today</button>
-                    <button type="button" class="task-filter-button px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200" data-filter="normal">Normal</button>
+                <div class="flex space-x-1 md:space-x-2 overflow-x-auto pb-1">
+                    <button type="button" class="task-filter-button px-2 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors duration-200 whitespace-nowrap" data-filter="all">All Tasks</button>
+                    <button type="button" class="task-filter-button px-2 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors duration-200 whitespace-nowrap" data-filter="urgent">Urgent</button>
+                    <button type="button" class="task-filter-button px-2 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors duration-200 whitespace-nowrap" data-filter="today">Today</button>
+                    <button type="button" class="task-filter-button px-2 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors duration-200 whitespace-nowrap" data-filter="normal">Normal</button>
                 </div>
             </div>
         </div>
         
         <div class="divide-y divide-gray-200">
             @forelse($pendingTasks as $task)
-            <div class="px-6 py-4 hover:bg-gray-50 transition-colors duration-150" data-task-id="{{ $task->id ?? $task['id'] ?? '' }}">
+            <div class="px-3 md:px-6 py-3 md:py-4 hover:bg-gray-50 transition-colors duration-150" data-task-id="{{ $task->id ?? $task['id'] ?? '' }}">
                 <div class="flex items-start justify-between">
-                    <div class="flex items-start space-x-4">
-                        <div class="flex-shrink-0 mt-1">
+                    <div class="flex items-start space-x-2 md:space-x-4 flex-grow overflow-hidden">
+                        <div class="flex-shrink-0 mt-0.5 md:mt-1">
                             <input type="checkbox" 
-                                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4 transition-colors duration-200 task-checkbox"
+                                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-3 w-3 md:h-4 md:w-4 transition-colors duration-200 task-checkbox"
                                    data-priority="{{ strtolower($task->priority ?? $task['priority']) }}">
                         </div>
-                        <div class="flex-grow">
-                            <div class="flex items-center space-x-3">
-                                <h4 class="text-sm font-medium text-gray-900 task-title">{{ $task->title ?? $task['title'] }}</h4>
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                        <div class="flex-grow overflow-hidden min-w-0">
+                            <div class="flex flex-col md:flex-row md:items-center md:space-x-3">
+                                <h4 class="text-sm font-medium text-gray-900 truncate task-title">{{ $task->title ?? $task['title'] }}</h4>
+                                <span class="inline-flex items-center px-1.5 py-0.5 md:px-2.5 md:py-0.5 rounded-full text-xs font-medium mt-1 md:mt-0 
                                     {{ (strtolower($task->priority ?? $task['priority']) == 'urgent') ? 'bg-red-100 text-red-800' : ((strtolower($task->priority ?? $task['priority']) == 'today') ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800') }}">
                                     {{ ucfirst($task->priority ?? $task['priority']) }}
                                 </span>
                             </div>
                             @if(!empty($task->description ?? ($task['description'] ?? null)))
-                            <p class="mt-2 text-sm text-gray-600">{{ $task->description ?? ($task['description'] ?? '') }}</p>
+                            <p class="mt-1.5 md:mt-2 text-xs md:text-sm text-gray-600 line-clamp-2">{{ $task->description ?? ($task['description'] ?? '') }}</p>
                             @endif
                         </div>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <a href="{{ route('reception.task.edit', $task) }}" class="inline-flex items-center p-1.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex items-center space-x-1 md:space-x-2 ml-2 flex-shrink-0">
+                        <a href="{{ route('reception.task.edit', $task) }}" class="inline-flex items-center p-1 md:p-1.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                            <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                             </svg>
                         </a>
                         <form action="{{ route('reception.task.destroy', $task) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this task?');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="inline-flex items-center p-1.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <button type="submit" class="inline-flex items-center p-1 md:p-1.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                                <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                 </svg>
                             </button>
@@ -172,13 +172,13 @@
                 </div>
             </div>
             @empty
-            <div class="px-6 py-12 text-center">
+            <div class="px-4 md:px-6 py-8 md:py-12 text-center">
                 <div class="flex flex-col items-center justify-center">
-                    <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-12 h-12 md:w-16 md:h-16 text-gray-300 mb-3 md:mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                     </svg>
-                    <p class="text-gray-500 text-lg font-medium">No pending tasks</p>
-                    <p class="text-gray-400 mt-1">All tasks are completed</p>
+                    <p class="text-gray-500 text-base md:text-lg font-medium">No pending tasks</p>
+                    <p class="text-gray-400 mt-1 text-xs md:text-sm">All tasks are completed</p>
                 </div>
             </div>
             @endforelse
@@ -187,48 +187,48 @@
 </div>
 
 <!-- Add Schedule/Task Modal -->
-<div id="add-schedule-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div class="mt-3 text-center">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Add New Schedule / Task</h3>
-            <div class="mt-2 px-7 py-3">
+<div id="add-schedule-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-4 md:top-8 lg:top-20 mx-auto p-3 md:p-5 border w-11/12 md:w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-2 md:mt-3 text-center">
+            <h3 class="text-base md:text-lg leading-6 font-medium text-gray-900">Add New Schedule / Task</h3>
+            <div class="mt-2 px-2 md:px-7 py-2 md:py-3">
                 <form action="{{ route('reception.schedule.store') }}" method="POST">
                     @csrf
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Type</label>
-                        <div>
+                    <div class="mb-3 md:mb-4">
+                        <label class="block text-gray-700 text-xs md:text-sm font-bold mb-1 md:mb-2">Type</label>
+                        <div class="flex flex-col sm:flex-row sm:space-x-4 sm:space-y-0 space-y-2">
                             <label class="inline-flex items-center">
-                                <input type="radio" name="type" value="event" class="form-radio" checked>
-                                <span class="ml-2">Event</span>
+                                <input type="radio" name="type" value="event" class="form-radio h-3 w-3 md:h-4 md:w-4" checked>
+                                <span class="ml-1 md:ml-2 text-xs md:text-sm">Event</span>
                             </label>
-                            <label class="inline-flex items-center ml-6">
-                                <input type="radio" name="type" value="task" class="form-radio">
-                                <span class="ml-2">Task</span>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="type" value="task" class="form-radio h-3 w-3 md:h-4 md:w-4">
+                                <span class="ml-1 md:ml-2 text-xs md:text-sm">Task</span>
                             </label>
                         </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="title" class="block text-gray-700 text-sm font-bold mb-2">Title</label>
-                        <input type="text" name="title" id="title" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <div class="mb-3 md:mb-4">
+                        <label for="title" class="block text-gray-700 text-xs md:text-sm font-bold mb-1 md:mb-2">Title</label>
+                        <input type="text" name="title" id="title" class="shadow appearance-none border rounded w-full py-1.5 md:py-2 px-2 md:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm md:text-base">
                     </div>
 
                     <div id="event-fields">
-                        <div class="mb-4">
-                            <label for="date" class="block text-gray-700 text-sm font-bold mb-2">Date</label>
-                            <input type="date" name="date" id="date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <div class="mb-3 md:mb-4">
+                            <label for="date" class="block text-gray-700 text-xs md:text-sm font-bold mb-1 md:mb-2">Date</label>
+                            <input type="date" name="date" id="date" class="shadow appearance-none border rounded w-full py-1.5 md:py-2 px-2 md:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm md:text-base">
                         </div>
-                        <div class="mb-4">
-                            <label for="time" class="block text-gray-700 text-sm font-bold mb-2">Time</label>
-                            <input type="time" name="time" id="time" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <div class="mb-3 md:mb-4">
+                            <label for="time" class="block text-gray-700 text-xs md:text-sm font-bold mb-1 md:mb-2">Time</label>
+                            <input type="time" name="time" id="time" class="shadow appearance-none border rounded w-full py-1.5 md:py-2 px-2 md:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm md:text-base">
                         </div>
-                        <div class="mb-4">
-                            <label for="location" class="block text-gray-700 text-sm font-bold mb-2">Location</label>
-                            <input type="text" name="location" id="location" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <div class="mb-3 md:mb-4">
+                            <label for="location" class="block text-gray-700 text-xs md:text-sm font-bold mb-1 md:mb-2">Location</label>
+                            <input type="text" name="location" id="location" class="shadow appearance-none border rounded w-full py-1.5 md:py-2 px-2 md:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm md:text-base">
                         </div>
-                        <div class="mb-4">
-                            <label for="event_status" class="block text-gray-700 text-sm font-bold mb-2">Status</label>
-                            <select name="status" id="event_status" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <div class="mb-3 md:mb-4">
+                            <label for="event_status" class="block text-gray-700 text-xs md:text-sm font-bold mb-1 md:mb-2">Status</label>
+                            <select name="status" id="event_status" class="shadow appearance-none border rounded w-full py-1.5 md:py-2 px-2 md:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm md:text-base">
                                 <option value="scheduled">Scheduled</option>
                                 <option value="upcoming">Upcoming</option>
                             </select>
@@ -236,32 +236,32 @@
                     </div>
 
                     <div id="task-fields" class="hidden">
-                        <div class="mb-4">
-                            <label for="priority" class="block text-gray-700 text-sm font-bold mb-2">Priority</label>
-                            <select name="priority" id="priority" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" disabled>
+                        <div class="mb-3 md:mb-4">
+                            <label for="priority" class="block text-gray-700 text-xs md:text-sm font-bold mb-1 md:mb-2">Priority</label>
+                            <select name="priority" id="priority" class="shadow appearance-none border rounded w-full py-1.5 md:py-2 px-2 md:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm md:text-base" disabled>
                                 <option value="normal">Normal</option>
                                 <option value="urgent">Urgent</option>
                                 <option value="today">Today</option>
                             </select>
                         </div>
-                        <div class="mb-4">
-                            <label for="task_status" class="block text-gray-700 text-sm font-bold mb-2">Status</label>
-                             <select name="status" id="task_status" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" disabled>
+                        <div class="mb-3 md:mb-4">
+                            <label for="task_status" class="block text-gray-700 text-xs md:text-sm font-bold mb-1 md:mb-2">Status</label>
+                             <select name="status" id="task_status" class="shadow appearance-none border rounded w-full py-1.5 md:py-2 px-2 md:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm md:text-base" disabled>
                                 <option value="pending">Pending</option>
                                 <option value="completed">Completed</option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="items-center px-4 py-3">
-                        <button id="ok-btn" type="submit" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    <div class="items-center px-2 md:px-4 py-2 md:py-3">
+                        <button id="ok-btn" type="submit" class="px-3 py-1.5 md:px-4 md:py-2 bg-blue-500 text-white text-xs md:text-sm font-medium rounded-md w-full shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
                             Add
                         </button>
                     </div>
                 </form>
             </div>
-            <div class="items-center px-4 py-3">
-                <button id="cancel-btn" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+            <div class="items-center px-2 md:px-4 py-2 md:py-3">
+                <button id="cancel-btn" class="px-3 py-1.5 md:px-4 md:py-2 bg-gray-500 text-white text-xs md:text-sm font-medium rounded-md w-full shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
                     Cancel
                 </button>
             </div>
@@ -299,6 +299,74 @@
     .filter-button.text-white {
         color: #FFFFFF;
     }
+
+    /* Line clamp for description */
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Mobile optimizations */
+    @media (max-width: 640px) {
+        .overflow-x-auto {
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .px-3 {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+        
+        .py-3 {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+        
+        .space-x-1 > :not([hidden]) ~ :not([hidden]) {
+            --tw-space-x-reverse: 0;
+            margin-right: calc(0.25rem * var(--tw-space-x-reverse));
+            margin-left: calc(0.25rem * calc(1 - var(--tw-space-x-reverse)));
+        }
+        
+        .text-xs {
+            font-size: 0.65rem;
+        }
+        
+        #add-schedule-modal .border {
+            border-width: 1px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .flex-col.sm\:flex-row {
+            flex-direction: column;
+        }
+        
+        .sm\:space-x-2 > :not([hidden]) ~ :not([hidden]) {
+            --tw-space-x-reverse: 0;
+            margin-right: calc(0.5rem * var(--tw-space-x-reverse));
+            margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
+        }
+        
+        .mb-3.sm\:mb-0 {
+            margin-bottom: 0;
+        }
+        
+        .mt-3.sm\:mt-0 {
+            margin-top: 0;
+        }
+        
+        .w-11\/12 {
+            width: 91.666667%;
+        }
+    }
+    
+    /* Prevent horizontal scrollbar from affecting layout */
+    .overflow-x-auto {
+        scrollbar-width: thin;
+    }
 </style>
 
 <script>
@@ -310,15 +378,26 @@
 
         openModalBtn.addEventListener('click', () => {
             modal.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
         });
 
         cancelBtn.addEventListener('click', () => {
             modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore scrolling
         });
 
         window.addEventListener('click', (e) => {
             if (e.target == modal) {
                 modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.style.display === 'block') {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
             }
         });
 
@@ -491,6 +570,24 @@
                     }
                 }
             });
+        });
+        
+        // Adjust modal for mobile orientation change
+        window.addEventListener('resize', function() {
+            if (modal.style.display === 'block') {
+                // Optional: Adjust modal if needed on resize
+                const modalContent = modal.querySelector('.border');
+                if (window.innerWidth < 768) {
+                    modalContent.style.width = '91.666667%';
+                    modalContent.style.marginTop = '1rem';
+                } else if (window.innerWidth < 1024) {
+                    modalContent.style.width = '24rem';
+                    modalContent.style.marginTop = '2rem';
+                } else {
+                    modalContent.style.width = '24rem';
+                    modalContent.style.marginTop = '5rem';
+                }
+            }
         });
     });
 </script>

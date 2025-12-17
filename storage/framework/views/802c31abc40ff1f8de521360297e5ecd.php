@@ -250,6 +250,12 @@ document.addEventListener('DOMContentLoaded', function () {
     transition: all 0.25s ease-out;
 }
 
+/* Ensure modal content scrolls on small screens */
+#paymentModalContent {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
 .scale-90 { transform: scale(0.9); }
 .scale-100 { transform: scale(1); }
 .opacity-0 { opacity: 0; }

@@ -38,6 +38,7 @@
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
             overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
         }
         .sidebar {
             width: 260px;
@@ -159,6 +160,11 @@
         ::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
         }
+        /* Ensure wide tables can scroll on small screens */
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
         [x-cloak] { display: none !important; }
     </style>
 </head>
@@ -271,7 +277,7 @@
             function toggleMobileMenu() {
                 sidebar.classList.toggle('mobile-open');
                 mobileOverlay.classList.toggle('active');
-                document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
+                document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : 'auto';
             }
             
             mobileMenuBtn.addEventListener('click', toggleMobileMenu);
