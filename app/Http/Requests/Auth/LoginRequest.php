@@ -49,6 +49,21 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Prevent login if account is not approved by admin
+        $user = Auth::user();
+        if ($user && !$user->approved) {
+            Auth::logout();
+            if ($user->status === false) {
+                throw ValidationException::withMessages([
+                    'email' => 'Your account has been rejected by an admin.',
+                ]);
+            }
+
+            throw ValidationException::withMessages([
+                'email' => 'Your account is pending admin approval.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

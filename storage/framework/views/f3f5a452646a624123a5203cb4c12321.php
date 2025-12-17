@@ -197,17 +197,17 @@
             <div class="space-y-3">
                 <?php $__empty_1 = true; $__currentLoopData = $todaySchedules; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $schedule): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <div class="flex items-center justify-between p-3 rounded-lg 
-                        <?php echo e($schedule->status == 'Upcoming' ? 'bg-blue-50' : ($schedule->status == 'Scheduled' ? 'bg-green-50' : 'bg-gray-50')); ?>">
+                        <?php echo e(strtolower($schedule->status) == 'upcoming' ? 'bg-blue-50' : (strtolower($schedule->status) == 'scheduled' ? 'bg-green-50' : 'bg-gray-50')); ?>">
                         <div class="flex items-center space-x-3">
                             <div class="w-2 h-8 rounded-full 
-                                <?php echo e($schedule->status == 'Upcoming' ? 'bg-blue-500' : ($schedule->status == 'Scheduled' ? 'bg-green-500' : 'bg-gray-400')); ?>"></div>
+                                <?php echo e(strtolower($schedule->status) == 'upcoming' ? 'bg-blue-500' : (strtolower($schedule->status) == 'scheduled' ? 'bg-green-500' : 'bg-gray-400')); ?>"></div>
                             <div>
                                 <p class="text-sm font-medium text-gray-800"><?php echo e($schedule->title); ?></p>
-                                <p class="text-xs text-gray-600"><?php echo e($schedule->time); ?> - <?php echo e($schedule->location); ?></p>
+                                <p class="text-xs text-gray-600"><?php echo e(\Carbon\Carbon::parse($schedule->time)->format('h:i A')); ?> - <?php echo e($schedule->location); ?></p>
                             </div>
                         </div>
                         <span class="px-2 py-1 text-xs rounded-full 
-                            <?php echo e($schedule->status == 'Upcoming' ? 'bg-blue-100 text-blue-800' : ($schedule->status == 'Scheduled' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800')); ?>">
+                            <?php echo e(strtolower($schedule->status) == 'upcoming' ? 'bg-blue-100 text-blue-800' : (strtolower($schedule->status) == 'scheduled' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800')); ?>">
                             <?php echo e($schedule->status); ?>
 
                         </span>
@@ -234,23 +234,21 @@
                 <?php endif; ?>
             </div>
             <div class="space-y-3">
-                <?php $__currentLoopData = $pendingTasks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $task): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php $__empty_1 = true; $__currentLoopData = $pendingTasks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $task): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <div class="flex items-center justify-between p-3 border rounded-lg
-                        <?php echo e($task->priority == 'High' ? 'border-red-200' : ($task->priority == 'Medium' ? 'border-yellow-200' : 'border-blue-200')); ?>">
+                        <?php echo e($task->priority == 'urgent' ? 'border-red-200' : ($task->priority == 'today' ? 'border-yellow-200' : 'border-blue-200')); ?>">
                         <div class="flex items-center space-x-3">
                             <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                             <div>
-                                <p class="text-sm font-medium text-gray-800"><?php echo e($task->task); ?></p>
-                                <p class="text-xs text-gray-600">Due: <?php echo e($task->due); ?></p>
+                                <p class="text-sm font-medium text-gray-800"><?php echo e($task->title); ?></p>
                             </div>
                         </div>
-                        <span class="text-sm <?php echo e($task->priority == 'High' ? 'text-red-600' : ($task->priority == 'Medium' ? 'text-yellow-600' : 'text-blue-600')); ?>">
-                            <?php echo e($task->priority); ?>
+                        <span class="text-sm <?php echo e($task->priority == 'urgent' ? 'text-red-600' : ($task->priority == 'today' ? 'text-yellow-600' : 'text-blue-600')); ?>">
+                            <?php echo e(ucfirst($task->priority)); ?>
 
                         </span>
                     </div>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                <?php if(count($pendingTasks) == 0): ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                     <p class="text-center text-gray-500">No pending tasks</p>
                 <?php endif; ?>
             </div>

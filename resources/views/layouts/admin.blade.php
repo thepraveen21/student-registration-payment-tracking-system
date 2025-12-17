@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin Dashboard') | Student Management System</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -208,6 +209,7 @@
         .page-transition {
             animation: fade-in 0.5s ease-in-out;
         }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -301,10 +303,10 @@
                 <div class="bg-primary-800/30 rounded-lg p-4 border border-primary-700/30">
                     <div class="flex items-center">
                         <div class="user-avatar w-10 h-10 rounded-full flex items-center justify-center mr-3">
-                            <span class="text-white font-semibold">AU</span>
+                            <span class="text-white font-semibold">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</span>
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-white">Admin User</p>
+                            <p class="text-sm font-medium text-white">{{ Auth::user()->name }}</p>
                             <p class="text-xs text-primary-200">Administrator</p>
                         </div>
                     </div>
@@ -331,14 +333,60 @@
         <!-- Right Section -->
         <div class="flex items-center space-x-4">
             <!-- Notifications -->
-            <div class="relative">
-                <button class="p-2.5 rounded-xl hover:bg-gray-100 transition-all duration-200 group relative">
+            <div class="relative" x-data="{ open: false }">
+                @php
+                    // Provided by AppServiceProvider view composer:
+                    // - $pendingAdminNotifications
+                    // - $pendingAdminCount
+                    $pending = $pendingAdminNotifications ?? collect();
+                    $pendingCount = $pendingAdminCount ?? 0;
+                @endphp
+
+                <button @click="open = !open" class="p-2.5 rounded-xl hover:bg-gray-100 transition-all duration-200 group relative">
                     <div class="relative">
                         <i class="fas fa-bell text-gray-600 text-lg group-hover:text-primary-600 transition-colors"></i>
-                        <span class="notification-badge bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm">5</span>
+                        @if($pendingCount > 0)
+                            <span class="notification-badge bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm">{{ $pendingCount }}</span>
+                        @endif
                     </div>
-                    <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-primary-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </button>
+
+                <!-- Dropdown -->
+                <div x-show="open" @click.away="open = false" x-cloak class="absolute right-0 mt-3 w-96 bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden z-50">
+                    <div class="p-3 border-b">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-semibold">Notifications</h4>
+                            <span class="text-xs text-gray-500">{{ $pendingCount }} pending</span>
+                        </div>
+                    </div>
+
+                    <div class="max-h-72 overflow-y-auto">
+                        @forelse($pending as $note)
+                            @php $d = $note->data; @endphp
+                            <div class="p-3 border-b hover:bg-gray-50">
+                                <div class="flex items-start">
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium">{{ $d['message'] ?? ($d['user_name'] ?? 'New user') }}</div>
+                                        <div class="text-xs text-gray-500 mt-1">{{ $d['user_name'] ?? '' }} — {{ ucfirst($d['role'] ?? '') }}</div>
+                                        <div class="text-xs text-gray-400 mt-1">{{ $note->created_at->diffForHumans() }}</div>
+                                    </div>
+                                    <div class="ml-3 flex items-center space-x-2">
+                                        <form method="POST" action="{{ route('admin.users.approve', ['user' => $d['user_id']]) }}">
+                                            @csrf
+                                            <button type="submit" class="px-3 py-1 text-xs bg-green-600 text-white rounded-md">Accept</button>
+                                        </form>
+                                        <form method="POST" action="{{ route('admin.users.reject', ['user' => $d['user_id']]) }}">
+                                            @csrf
+                                            <button type="submit" class="px-3 py-1 text-xs bg-red-600 text-white rounded-md">Reject</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="p-4 text-sm text-gray-600">No notifications</div>
+                        @endforelse
+                    </div>
+                </div>
             </div>
 
             <!-- Quick Actions -->

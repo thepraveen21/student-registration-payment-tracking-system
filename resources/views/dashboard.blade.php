@@ -135,8 +135,8 @@
 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
         <div>
-            <h3 class="text-lg font-semibold text-gray-800">Recent Payments</h3>
-            <p class="text-sm text-gray-500 mt-1">Latest payment transactions</p>
+            <h3 class="text-lg font-semibold text-gray-800">Recent Monthly Payments</h3>
+            <p class="text-sm text-gray-500 mt-1">Latest monthly payment transactions</p>
         </div>
         <div class="bg-green-50 text-green-600 text-xs font-medium px-3 py-1 rounded-full">
             {{ count($recentPayments) }} payments
@@ -146,8 +146,9 @@
         <table class="w-full">
             <thead>
                 <tr class="bg-gray-50/60 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <th class="px-6 py-3">Transaction</th>
                     <th class="px-6 py-3">Student</th>
+                    <th class="px-6 py-3">Course</th>
+                    <th class="px-6 py-3">Month</th>
                     <th class="px-6 py-3">Amount</th>
                     <th class="px-6 py-3">Date</th>
                 </tr>
@@ -158,25 +159,30 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-green-100 to-emerald-200 rounded-full flex items-center justify-center shadow-sm">
-                                    <i class="fas fa-rupee-sign text-green-700 text-sm"></i>
+                                    <span class="text-green-700 font-semibold">{{ substr($payment->student->name, 0, 1) }}</span>
                                 </div>
                                 <div class="ml-4">
-                                    <div class="text-sm font-semibold text-gray-900">Payment #{{ $payment->id }}</div>
-                                    <div class="text-xs text-gray-500">Completed</div>
+                                    <div class="text-sm font-semibold text-gray-900">{{ $payment->student->full_name }}</div>
+                                    <div class="text-xs text-gray-500">ID: {{ $payment->student->id }}</div>
                                 </div>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900">{{ $payment->student->name }}</div>
-                            <div class="text-xs text-gray-500">{{ $payment->student->course->name }}</div>
+                            <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                <i class="fas fa-book-open mr-1.5 text-xs"></i>
+                                {{ $payment->course->name }}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">Month {{ $payment->month_number }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-lg font-bold text-green-700">Rs.{{ number_format($payment->amount, 2) }}</div>
-                            <div class="text-xs text-gray-500">Paid in full</div>
+                            <div class="text-xs text-gray-500">Recorded</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900">{{ $payment->created_at->format('d M, Y') }}</div>
-                            <div class="text-xs text-gray-500">{{ $payment->created_at->diffForHumans() }}</div>
+                            <div class="text-sm font-medium text-gray-900">{{ $payment->payment_date->format('d M, Y') }}</div>
+                            <div class="text-xs text-gray-500">{{ $payment->payment_date->diffForHumans() }}</div>
                         </td>
                     </tr>
                 @endforeach
@@ -188,7 +194,7 @@
             <div class="text-gray-400 mb-2">
                 <i class="fas fa-credit-card text-3xl"></i>
             </div>
-            <p class="text-gray-500">No recent payments found</p>
+            <p class="text-gray-500">No recent monthly payments found</p>
         </div>
     @endif
 </div>

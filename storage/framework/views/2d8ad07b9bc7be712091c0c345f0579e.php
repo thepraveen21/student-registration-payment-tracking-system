@@ -60,7 +60,7 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-600">Active</p>
-                    <p class="text-2xl font-bold text-gray-900"><?php echo e($students->where('status', 'active')->count()); ?></p>
+                    <p class="text-2xl font-bold text-gray-900"><?php echo e($totalActiveStudents); ?></p>
                 </div>
             </div>
         </div>
@@ -74,7 +74,7 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-600">Inactive</p>
-                    <p class="text-2xl font-bold text-gray-900"><?php echo e($students->where('status', 'inactive')->count()); ?></p>
+                    <p class="text-2xl font-bold text-gray-900"><?php echo e($totalInactiveStudents); ?></p>
                 </div>
             </div>
         </div>
@@ -88,7 +88,7 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-600">This Month</p>
-                    <p class="text-2xl font-bold text-gray-900"><?php echo e($students->where('created_at', '>=', now()->startOfMonth())->count()); ?></p>
+                    <p class="text-2xl font-bold text-gray-900"><?php echo e($totalThisMonthStudents); ?></p>
                 </div>
             </div>
         </div>
@@ -96,55 +96,57 @@
 
     <!-- Filters and Search -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6 p-6">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-            <!-- Search Box -->
-            <div class="relative flex-grow lg:max-w-md">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                </div>
-                <input type="search" 
-                       placeholder="Search students by name, email, or registration..."
-                       class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
-            </div>
-            
-            <!-- Filter Controls -->
-            <div class="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
-                <div class="relative">
-                    <select class="appearance-none bg-white border border-gray-300 rounded-lg py-2.5 px-4 pr-10 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
-                        <option>All Status</option>
-                        <option>Active</option>
-                        <option>Inactive</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+        <form action="<?php echo e(route('admin.students.index')); ?>" method="GET">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+                <!-- Search Box -->
+                <div class="relative flex-grow lg:max-w-md">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                     </div>
+                    <input type="search" name="search" value="<?php echo e(request('search')); ?>"
+                           placeholder="Search students by name, email, or registration..."
+                           class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
                 </div>
                 
-                <div class="relative">
-                    <select class="appearance-none bg-white border border-gray-300 rounded-lg py-2.5 px-4 pr-10 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
-                        <option>Rows: 10</option>
-                        <option>Rows: 25</option>
-                        <option>Rows: 50</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                        </svg>
+                <!-- Filter Controls -->
+                <div class="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                    <div class="relative">
+                        <select name="status" id="status-filter" class="appearance-none bg-white border border-gray-300 rounded-lg py-2.5 px-4 pr-10 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                            <option value="">All Status</option>
+                            <option value="active" <?php echo e(request('status') == 'active' ? 'selected' : ''); ?>>Active</option>
+                            <option value="inactive" <?php echo e(request('status') == 'inactive' ? 'selected' : ''); ?>>Inactive</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                            </svg>
+                        </div>
                     </div>
+                    
+                    <div class="relative">
+                        <select name="per_page" id="per-page-filter" class="appearance-none bg-white border border-gray-300 rounded-lg py-2.5 px-4 pr-10 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                            <option value="10" <?php echo e(request('per_page') == 10 ? 'selected' : ''); ?>>Rows: 10</option>
+                            <option value="25" <?php echo e(request('per_page') == 25 ? 'selected' : ''); ?>>Rows: 25</option>
+                            <option value="50" <?php echo e(request('per_page') == 50 ? 'selected' : ''); ?>>Rows: 50</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="inline-flex items-center px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                        </svg>
+                        Filter
+                    </button>
                 </div>
-                
-                <button class="inline-flex items-center px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                    </svg>
-                    Filter
-                </button>
             </div>
-        </div>
+        </form>
     </div>
 
     <!-- Students Table -->
@@ -286,7 +288,7 @@
                 </div>
                 
                 <div class="flex items-center space-x-2">
-                    <?php echo e($students->links()); ?>
+                    <?php echo e($students->appends(request()->query())->links()); ?>
 
                 </div>
             </div>
@@ -339,5 +341,13 @@
         color: white;
     }
 </style>
+<script>
+    document.getElementById('status-filter').addEventListener('change', function() {
+        this.form.submit();
+    });
+    document.getElementById('per-page-filter').addEventListener('change', function() {
+        this.form.submit();
+    });
+</script>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH G:\Projects\innovior info\Student Management System\resources\views/admin/students/index.blade.php ENDPATH**/ ?>

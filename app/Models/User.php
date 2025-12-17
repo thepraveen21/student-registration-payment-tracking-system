@@ -23,6 +23,8 @@ class User extends Authenticatable
         'phone',
         'role',
         'status',
+        'approved',
+        'created_by',
     ];
 
     /**
@@ -46,6 +48,12 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'status' => 'boolean',
+            'approved' => 'boolean',
         ];
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(self::class, 'created_by');
     }
 }

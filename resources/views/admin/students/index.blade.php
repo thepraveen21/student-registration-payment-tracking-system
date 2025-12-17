@@ -62,7 +62,7 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-600">Active</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ $students->where('status', 'active')->count() }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $totalActiveStudents }}</p>
                 </div>
             </div>
         </div>
@@ -76,7 +76,7 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-600">Inactive</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ $students->where('status', 'inactive')->count() }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $totalInactiveStudents }}</p>
                 </div>
             </div>
         </div>
@@ -90,7 +90,7 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-600">This Month</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ $students->where('created_at', '>=', now()->startOfMonth())->count() }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $totalThisMonthStudents }}</p>
                 </div>
             </div>
         </div>

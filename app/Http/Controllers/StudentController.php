@@ -8,6 +8,7 @@ use App\Models\Center;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\DB; // Add this import
 
 use App\Models\QRCode as QRCodeModel;
 
@@ -26,7 +27,8 @@ class StudentController extends Controller
                 $q->where('first_name', 'like', "%{$search}%")
                   ->orWhere('last_name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('registration_number', 'like', "%{$search}%");
+                  ->orWhere('registration_number', 'like', "%{$search}%")
+                  ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$search}%"); // Full name search
             });
         }
 
@@ -37,7 +39,11 @@ class StudentController extends Controller
         $perPage = $request->input('per_page', 10);
         $students = $query->orderBy('id')->paginate($perPage);
 
-        return view('admin.students.index', compact('students'));
+        $totalActiveStudents = Student::where('status', 'active')->count();
+        $totalInactiveStudents = Student::where('status', 'inactive')->count();
+        $totalThisMonthStudents = Student::where('created_at', '>=', now()->startOfMonth())->count();
+
+        return view('admin.students.index', compact('students', 'totalActiveStudents', 'totalInactiveStudents', 'totalThisMonthStudents'));
     }
 
     /**

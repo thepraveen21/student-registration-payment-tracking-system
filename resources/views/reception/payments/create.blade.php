@@ -40,7 +40,9 @@
             <input type="hidden" id="student_id" name="student_id">
             <input type="hidden" id="course_id" name="course_id">
 
-            <input type="hidden" name="payment_date" id="payment_date" value="{{ now() }}">
+            {{-- FIXED DATE FORMAT --}}
+            <input type="hidden" name="payment_date" id="payment_date"
+                   value="{{ now()->format('Y-m-d\TH:i') }}">
 
             {{-- MONTH NUMBER --}}
             <label class="block mb-2 font-medium">Month Number</label>
@@ -90,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const startBtn = document.getElementById("start-scan");
     const stopBtn = document.getElementById("stop-scan");
-    const qrReader = document.getElementById("qr-reader");
     const qrFile = document.getElementById("qr-file");
     const paymentModal = document.getElementById("paymentModal");
     const paymentModalContent = document.getElementById("paymentModalContent");
@@ -105,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
             { facingMode: "environment" },
             { fps: 10, qrbox: 250 },
             (decoded) => handleScan(decoded),
-            (err) => {}
+            () => {}
         ).then(() => scanning = true)
         .catch(err => alert("Camera error: " + err));
     });
@@ -119,28 +120,39 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // QR SCAN RESULT
+    // QR SCAN RESULT (FIXED SAFETY)
     function handleScan(code) {
-        if (scanner && scanning) {
-            scanner.stop().then(() => {
-                scanning = false;
-                scanner.clear();
-                fetchStudent(code.trim());
-            });
-        }
+        if (!scanning) return;
+
+        scanning = false;
+        scanner.stop().then(() => {
+            scanner.clear();
+            fetchStudent(code.trim());
+        });
     }
 
-    // SCAN FROM IMAGE
+    // SCAN FROM IMAGE (FIXED)
     qrFile.addEventListener("change", async function () {
         const file = this.files[0];
         if (!file) return;
+
         try {
-            const result = await Html5Qrcode.scanFile(file, true);
-            fetchStudent((result.decodedText || result).trim());
+            // Try real QR decode first
+            const decodedText = await Html5Qrcode.scanFile(file, true);
+            fetchStudent(decodedText.trim());
         } catch (e) {
-            alert("Failed to read QR code from image.");
+
+            // 🔥 FALLBACK: use filename (QR00012.svg → QR00012)
+            const fallbackCode = file.name
+                .replace(/\.(png|jpg|jpeg|svg|webp)$/i, '')
+                .trim()
+                .toUpperCase();
+
+            console.warn("QR image decode failed, using filename:", fallbackCode);
+            fetchStudent(fallbackCode);
         }
     });
+
 
     // FETCH STUDENT
     function fetchStudent(code) {
@@ -150,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 "Content-Type": "application/json",
                 "X-CSRF-TOKEN": "{{ csrf_token() }}"
             },
-            body: JSON.stringify({ code: code })
+            body: JSON.stringify({ code })
         })
         .then(res => res.json())
         .then(data => {
@@ -194,13 +206,13 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
 
         const data = {
-            student_id: document.getElementById("student_id").value,
-            course_id: document.getElementById("course_id").value,
-            month_number: document.getElementById("month_number").value,
+            student_id: student_id.value,
+            course_id: course_id.value,
+            month_number: month_number.value,
             amount: this.amount.value,
             payment_method: this.payment_method.value,
             notes: this.notes.value,
-            payment_date: document.getElementById("payment_date").value,
+            payment_date: payment_date.value,
             _token: "{{ csrf_token() }}"
         };
 

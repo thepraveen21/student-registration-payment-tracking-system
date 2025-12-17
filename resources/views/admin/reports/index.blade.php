@@ -11,13 +11,13 @@
             </div>
             <div class="mt-4 sm:mt-0">
                 <div class="flex items-center space-x-3">
-                    <button onclick="window.print()" 
+                    <!-- <button onclick="window.print()" 
                            class="inline-flex items-center px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
                         </svg>
                         Print Reports
-                    </button>
+                    </button> -->
                 </div>
             </div>
         </div>
@@ -156,6 +156,18 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                         </svg>
                     </a>
+                    <a href="{{ route('admin.reports.payment-wise-students') }}" 
+                       class="flex items-center justify-between p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors duration-200">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 2v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <span class="text-green-800 font-medium">Payment-wise Student Report</span>
+                        </div>
+                        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
                 </div>
             </div>
 
@@ -192,11 +204,11 @@
         </div>
 
         <!-- Coming Soon Reports -->
-        <div class="mt-8">
+        <!-- <div class="mt-8">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">Coming Soon Reports</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> -->
                 <!-- Center Reports -->
-                <div class="bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl shadow-sm border border-gray-300 overflow-hidden opacity-75">
+                <!-- <div class="bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl shadow-sm border border-gray-300 overflow-hidden opacity-75">
                     <div class="px-6 py-4 border-b border-gray-300">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 bg-gray-400 p-3 rounded-lg">
@@ -215,10 +227,10 @@
                             Coming Soon
                         </span>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Monthly Reports -->
-                <div class="bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl shadow-sm border border-gray-300 overflow-hidden opacity-75">
+                <!-- <div class="bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl shadow-sm border border-gray-300 overflow-hidden opacity-75">
                     <div class="px-6 py-4 border-b border-gray-300">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 bg-gray-400 p-3 rounded-lg">
@@ -237,10 +249,10 @@
                             Coming Soon
                         </span>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Export Reports -->
-                <div class="bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl shadow-sm border border-gray-300 overflow-hidden opacity-75">
+                <!-- <div class="bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl shadow-sm border border-gray-300 overflow-hidden opacity-75">
                     <div class="px-6 py-4 border-b border-gray-300">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 bg-gray-400 p-3 rounded-lg">
@@ -259,7 +271,7 @@
                             Coming Soon
                         </span>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>

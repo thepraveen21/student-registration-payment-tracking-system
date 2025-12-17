@@ -15,12 +15,18 @@ class AttendanceController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Attendance::with(['student.course', 'student.payments'])
+        $query = Attendance::with(['student.course', 'student.monthlyPayments'])
             ->orderBy('attended_at', 'desc');
 
         // Filters
-        if ($request->student_id) {
-            $query->where('student_id', $request->student_id);
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->whereHas('student', function($q) use ($search) {
+                $q->where('first_name', 'like', '%' . $search . '%')
+                  ->orWhere('last_name', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%')
+                  ->orWhere('registration_number', 'like', '%' . $search . '%');
+            });
         }
 
         if ($request->course) {
@@ -39,9 +45,12 @@ class AttendanceController extends Controller
         // Group AFTER pagination
         $groupedAttendances = $attendances->getCollection()
             ->map(function ($attendance) {
-                $courseFee = $attendance->student->course->fee ?? 0;
-                $totalPaid = $attendance->student->payments->sum('amount');
-                $attendance->payment_status = $totalPaid >= $courseFee && $courseFee > 0 ? 'Paid' : 'Pending';
+                $monthly_payments = $attendance->student->monthlyPayments->keyBy('month_number');
+                $payment_status_by_month = [];
+                for ($i = 1; $i <= 4; $i++) {
+                    $payment_status_by_month[$i] = $monthly_payments->has($i) ? 'Paid' : 'Unpaid';
+                }
+                $attendance->payment_status_by_month = $payment_status_by_month;
                 return $attendance;
             })
             ->groupBy(function ($attendance) {
@@ -55,11 +64,14 @@ class AttendanceController extends Controller
         $courses = Course::all();
         $latestAttendance = Attendance::orderBy('attended_at', 'desc')->first();
 
-        return view('reception.attendance.index', compact(
-            'attendances',
-            'courses',
-            'latestAttendance'
-        ));
+        return view('reception.attendance.index', [
+            'attendances' => $attendances,
+            'courses' => $courses,
+            'latestAttendance' => $latestAttendance,
+            'search' => $request->search ?? '',
+            'selected_course' => $request->course ?? '',
+            'selected_date' => $request->date ?? '',
+        ]);
     }
 
 

@@ -20,31 +20,50 @@
         <form action="{{ route('reception.payments.update', $payment) }}" method="POST">
             @csrf
             @method('PUT')
-            <div class="mb-4">
-                <label for="student_id" class="block text-gray-700 text-sm font-bold mb-2">Student:</label>
-                <select name="student_id" id="student_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                    @foreach($students as $student)
-                        <option value="{{ $student->id }}" {{ $payment->student_id == $student->id ? 'selected' : '' }}>{{ $student->name }}</option>
-                    @endforeach
-                </select>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Student -->
+                <div class="md:col-span-2">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Student:</label>
+                    <input type="text" value="{{ $payment->student->name }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-200 leading-tight focus:outline-none focus:shadow-outline" disabled>
+                    <input type="hidden" name="student_id" value="{{ $payment->student_id }}">
+                </div>
+
+                <!-- Course -->
+                <div>
+                    <label for="course_id" class="block text-gray-700 text-sm font-bold mb-2">Course:</label>
+                    <select name="course_id" id="course_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        @foreach($courses as $course)
+                            <option value="{{ $course->id }}" {{ $payment->course_id == $course->id ? 'selected' : '' }}>{{ $course->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Month Number -->
+                <div>
+                    <label for="month_number" class="block text-gray-700 text-sm font-bold mb-2">Month Number:</label>
+                    <input type="number" name="month_number" id="month_number" value="{{ $payment->month_number }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required min="1" max="12">
+                </div>
+
+                <!-- Amount -->
+                <div>
+                    <label for="amount" class="block text-gray-700 text-sm font-bold mb-2">Amount:</label>
+                    <input type="number" name="amount" id="amount" value="{{ $payment->amount }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required step="0.01">
+                </div>
+
+                <!-- Payment Date -->
+                <div>
+                    <label for="payment_date" class="block text-gray-700 text-sm font-bold mb-2">Payment Date & Time:</label>
+                    <input type="datetime-local" id="payment_date" value="{{ $payment_date_formatted }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-200 leading-tight focus:outline-none focus:shadow-outline" disabled>
+                </div>
+
+                <!-- Notes -->
+                <div class="md:col-span-2">
+                    <label for="notes" class="block text-gray-700 text-sm font-bold mb-2">Notes:</label>
+                    <textarea name="notes" id="notes" rows="3" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ $payment->notes }}</textarea>
+                </div>
             </div>
-            <div class="mb-4">
-                <label for="amount" class="block text-gray-700 text-sm font-bold mb-2">Amount:</label>
-                <input type="number" name="amount" id="amount" value="{{ $payment->amount }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-            </div>
-            <div class="mb-4">
-                <label for="payment_date" class="block text-gray-700 text-sm font-bold mb-2">Date:</label>
-                <input type="date" name="payment_date" id="payment_date" value="{{ $payment->payment_date ? $payment->payment_date->format('Y-m-d') : '' }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-            </div>
-            <div class="mb-4">
-                <label for="payment_method" class="block text-gray-700 text-sm font-bold mb-2">Payment Method:</label>
-                <select name="payment_method" id="payment_method" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                    <option value="cash" {{ $payment->payment_method == 'cash' ? 'selected' : '' }}>Cash</option>
-                    <option value="card" {{ $payment->payment_method == 'card' ? 'selected' : '' }}>Card</option>
-                    <option value="bank_transfer" {{ $payment->payment_method == 'bank_transfer' ? 'selected' : '' }}>Bank Transfer</option>
-                </select>
-            </div>
-            <div class="flex items-center justify-between">
+
+            <div class="flex items-center justify-between mt-8">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                     Update Payment
                 </button>

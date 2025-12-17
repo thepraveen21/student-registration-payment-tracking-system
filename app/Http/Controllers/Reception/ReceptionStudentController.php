@@ -16,11 +16,43 @@ class ReceptionStudentController extends Controller
     /**
      * Display a listing of students.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Eager-load both course and center
-        $students = Student::with(['course', 'center'])->orderBy('id', 'asc')->paginate(10);
-        return view('reception.students.index', compact('students'));
+        $query = Student::with(['course', 'center'])->orderBy('id', 'asc');
+
+        // Search functionality
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('first_name', 'like', '%' . $search . '%')
+                  ->orWhere('last_name', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%')
+                  ->orWhere('registration_number', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Status filter
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        }
+
+        // Pagination
+        $rows = $request->input('rows', 10); // Default to 10 rows per page
+        $students = $query->paginate($rows);
+
+        $totalActiveStudents = Student::where('status', 'active')->count();
+        $totalInactiveStudents = Student::where('status', 'inactive')->count();
+        $totalThisMonthStudents = Student::where('created_at', '>=', now()->startOfMonth())->count();
+
+        return view('reception.students.index', [
+            'students' => $students,
+            'search' => $request->search ?? '',
+            'status' => $request->status ?? '',
+            'rows' => $rows,
+            'totalActiveStudents' => $totalActiveStudents,
+            'totalInactiveStudents' => $totalInactiveStudents,
+            'totalThisMonthStudents' => $totalThisMonthStudents,
+        ]);
     }
 
     /**

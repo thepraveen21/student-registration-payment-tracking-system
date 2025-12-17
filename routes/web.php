@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\MonthlyPaymentController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AdvancedReportController;
 use App\Http\Controllers\ReceptionController;
@@ -59,7 +60,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         'destroy' => 'admin.students.destroy',
     ]);
 
-    Route::resource('/admin/payments', PaymentController::class)->names([
+    Route::resource('/admin/payments', MonthlyPaymentController::class)->names([
         'index' => 'admin.payments.index',
         'create' => 'admin.payments.create',
         'store' => 'admin.payments.store',
@@ -69,10 +70,13 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         'destroy' => 'admin.payments.destroy',
     ]);
 
+    Route::get('/admin/students/{id}/course', [MonthlyPaymentController::class, 'getCourse'])->name('admin.students.get_course');
+
     // Reports
     Route::get('/admin/reports', [AdvancedReportController::class, 'index'])->name('admin.reports.index');
     Route::get('/admin/reports/course-wise-students', [AdvancedReportController::class, 'courseWiseStudents'])->name('admin.reports.course-wise-students');
     Route::get('/admin/reports/payment-status', [AdvancedReportController::class, 'paymentStatus'])->name('admin.reports.payment-status');
+    Route::get('/admin/reports/payment-wise-students', [AdvancedReportController::class, 'paymentWiseStudents'])->name('admin.reports.payment-wise-students');
     Route::get('/admin/reports/overdue-cases', [AdvancedReportController::class, 'overdueCases'])->name('admin.reports.overdue-cases');
     Route::get('/admin/reports/revenue', [AdvancedReportController::class, 'revenue'])->name('admin.reports.revenue');
     Route::get('/admin/reports/enrollment-summary', [AdvancedReportController::class, 'enrollmentSummary'])->name('admin.reports.enrollment-summary');
@@ -97,6 +101,10 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::post('/admin/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('admin.notifications.mark-all-read');
     Route::delete('/admin/notifications/{notification}', [NotificationController::class, 'destroy'])->name('admin.notifications.destroy');
     Route::get('/admin/notifications/overdue-preview', [NotificationController::class, 'overduePreview'])->name('admin.notifications.overdue-preview');
+
+    // User approval routes for admins
+    Route::post('/admin/users/{user}/approve', [\App\Http\Controllers\Admin\UserApprovalController::class, 'approve'])->name('admin.users.approve');
+    Route::post('/admin/users/{user}/reject', [\App\Http\Controllers\Admin\UserApprovalController::class, 'reject'])->name('admin.users.reject');
 
     Route::get('admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
     Route::post('admin/settings', [SettingController::class, 'update'])->name('admin.settings.update');
@@ -158,6 +166,8 @@ Route::middleware(['auth', 'role:receptionist'])
     // Reports
     Route::get('/reports', [ReportController::class, 'index'])
         ->name('reports.index');
+    Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
+
 
 
     // Settings
@@ -167,6 +177,13 @@ Route::middleware(['auth', 'role:receptionist'])
 // Reception schedule
 Route::prefix('reception')->middleware(['auth', 'role:receptionist'])->group(function () {
     Route::get('/schedule', [App\Http\Controllers\ReceptionController::class, 'schedule'])->name('reception.schedule.index');
+    Route::post('/schedule', [App\Http\Controllers\Reception\ReceptionScheduleController::class, 'store'])->name('reception.schedule.store');
+    Route::get('/schedule/{schedule}/edit', [App\Http\Controllers\Reception\ReceptionScheduleController::class, 'edit'])->name('reception.schedule.edit');
+    Route::put('/schedule/{schedule}', [App\Http\Controllers\Reception\ReceptionScheduleController::class, 'update'])->name('reception.schedule.update');
+    Route::delete('/schedule/{schedule}', [App\Http\Controllers\Reception\ReceptionScheduleController::class, 'destroy'])->name('reception.schedule.destroy');
+    Route::get('/tasks/{task}/edit', [App\Http\Controllers\Reception\ReceptionScheduleController::class, 'editTask'])->name('reception.task.edit');
+    Route::put('/tasks/{task}', [App\Http\Controllers\Reception\ReceptionScheduleController::class, 'updateTask'])->name('reception.task.update');
+    Route::delete('/tasks/{task}', [App\Http\Controllers\Reception\ReceptionScheduleController::class, 'destroyTask'])->name('reception.task.destroy');
 });
 
 // Profile

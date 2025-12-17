@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Payment;
 use App\Models\PaymentSchedule;
 use App\Models\Student;
+use App\Models\MonthlyPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -18,7 +19,7 @@ class DashboardController extends Controller
         $totalStudents = Student::count();
         $activeStudents = Student::where('status', 'active')->count();
         $overduePayments = PaymentSchedule::where('status', 'overdue')->count();
-        $monthlyRevenue = Payment::whereMonth('created_at', now()->month)->sum('amount');
+$monthlyRevenue = MonthlyPayment::whereMonth('created_at', now()->month)->sum('amount');
 
         // Payment chart: last 6 months (ensures chronological labels and zero-fill)
         $months = collect();
@@ -26,7 +27,7 @@ class DashboardController extends Controller
             $months->push(now()->subMonths($i)->format('M Y'));
         }
 
-        $paymentSums = Payment::select(
+        $paymentSums = MonthlyPayment::select(
             DB::raw('YEAR(created_at) as yr'),
             DB::raw('MONTH(created_at) as mth'),
             // Use MIN(created_at) inside DATE_FORMAT so month_label is an aggregate
@@ -56,7 +57,7 @@ class DashboardController extends Controller
             ->pluck('students_count', 'name');
 
         $recentStudents = Student::with('course')->latest()->take(5)->get();
-        $recentPayments = Payment::with('student')->latest()->take(5)->get();
+        $recentPayments = MonthlyPayment::with('student')->latest()->take(5)->get();
 
         return view('dashboard', compact(
             'totalStudents',

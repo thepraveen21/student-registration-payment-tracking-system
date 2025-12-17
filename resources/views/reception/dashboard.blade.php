@@ -205,17 +205,17 @@
             <div class="space-y-3">
                 @forelse($todaySchedules as $schedule)
                     <div class="flex items-center justify-between p-3 rounded-lg 
-                        {{ $schedule->status == 'Upcoming' ? 'bg-blue-50' : ($schedule->status == 'Scheduled' ? 'bg-green-50' : 'bg-gray-50') }}">
+                        {{ strtolower($schedule->status) == 'upcoming' ? 'bg-blue-50' : (strtolower($schedule->status) == 'scheduled' ? 'bg-green-50' : 'bg-gray-50') }}">
                         <div class="flex items-center space-x-3">
                             <div class="w-2 h-8 rounded-full 
-                                {{ $schedule->status == 'Upcoming' ? 'bg-blue-500' : ($schedule->status == 'Scheduled' ? 'bg-green-500' : 'bg-gray-400') }}"></div>
+                                {{ strtolower($schedule->status) == 'upcoming' ? 'bg-blue-500' : (strtolower($schedule->status) == 'scheduled' ? 'bg-green-500' : 'bg-gray-400') }}"></div>
                             <div>
                                 <p class="text-sm font-medium text-gray-800">{{ $schedule->title }}</p>
-                                <p class="text-xs text-gray-600">{{ $schedule->time }} - {{ $schedule->location }}</p>
+                                <p class="text-xs text-gray-600">{{ \Carbon\Carbon::parse($schedule->time)->format('h:i A') }} - {{ $schedule->location }}</p>
                             </div>
                         </div>
                         <span class="px-2 py-1 text-xs rounded-full 
-                            {{ $schedule->status == 'Upcoming' ? 'bg-blue-100 text-blue-800' : ($schedule->status == 'Scheduled' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800') }}">
+                            {{ strtolower($schedule->status) == 'upcoming' ? 'bg-blue-100 text-blue-800' : (strtolower($schedule->status) == 'scheduled' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800') }}">
                             {{ $schedule->status }}
                         </span>
                     </div>
@@ -241,24 +241,22 @@
                 @endif
             </div>
             <div class="space-y-3">
-                @foreach($pendingTasks as $task)
+                @forelse($pendingTasks as $task)
                     <div class="flex items-center justify-between p-3 border rounded-lg
-                        {{ $task->priority == 'High' ? 'border-red-200' : ($task->priority == 'Medium' ? 'border-yellow-200' : 'border-blue-200') }}">
+                        {{ $task->priority == 'urgent' ? 'border-red-200' : ($task->priority == 'today' ? 'border-yellow-200' : 'border-blue-200') }}">
                         <div class="flex items-center space-x-3">
                             <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                             <div>
-                                <p class="text-sm font-medium text-gray-800">{{ $task->task }}</p>
-                                <p class="text-xs text-gray-600">Due: {{ $task->due }}</p>
+                                <p class="text-sm font-medium text-gray-800">{{ $task->title }}</p>
                             </div>
                         </div>
-                        <span class="text-sm {{ $task->priority == 'High' ? 'text-red-600' : ($task->priority == 'Medium' ? 'text-yellow-600' : 'text-blue-600') }}">
-                            {{ $task->priority }}
+                        <span class="text-sm {{ $task->priority == 'urgent' ? 'text-red-600' : ($task->priority == 'today' ? 'text-yellow-600' : 'text-blue-600') }}">
+                            {{ ucfirst($task->priority) }}
                         </span>
                     </div>
-                @endforeach
-                @if(count($pendingTasks) == 0)
+                @empty
                     <p class="text-center text-gray-500">No pending tasks</p>
-                @endif
+                @endforelse
             </div>
         </div>
     </div>

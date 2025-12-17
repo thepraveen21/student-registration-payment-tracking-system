@@ -6,14 +6,13 @@
     <div class="mb-8">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Payment Management</h1>
-                <p class="mt-2 text-sm text-gray-600">Track and manage all student payments and transactions</p>
+                <h1 class="text-3xl font-bold text-gray-900">Monthly Payments</h1>
+                <p class="mt-2 text-sm text-gray-600">Track and manage all student monthly payments</p>
             </div>
             <div class="mt-4 sm:mt-0">
                 <a href="{{ route('admin.payments.create') }}" 
                    class="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
                     Record Payment
@@ -55,9 +54,7 @@
         </div>
         
         @php
-            $totalAmount = $payments->sum('amount');
-            $todayAmount = $payments->where('payment_date', today())->sum('amount');
-            $thisMonthAmount = $payments->whereBetween('payment_date', [now()->startOfMonth(), now()->endOfMonth()])->sum('amount');
+            // $totalAmount, $todayAmount, and $thisMonthAmount are passed from the controller
         @endphp
         
         <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
@@ -103,60 +100,6 @@
         </div>
     </div>
 
-    <!-- Filters and Search -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6 p-6">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-            <!-- Search Box -->
-            <div class="relative flex-grow lg:max-w-md">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                </div>
-                <input type="search" 
-                       placeholder="Search payments by student, receipt, or amount..."
-                       class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200">
-            </div>
-            
-            <!-- Filter Controls -->
-            <div class="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
-                <div class="relative">
-                    <select class="appearance-none bg-white border border-gray-300 rounded-lg py-2.5 px-4 pr-10 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200">
-                        <option>All Payment Methods</option>
-                        <option>Cash</option>
-                        <option>Card</option>
-                        <option>Bank Transfer</option>
-                        <option>Check</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                        </svg>
-                    </div>
-                </div>
-                
-                <div class="relative">
-                    <input type="date" 
-                           class="bg-white border border-gray-300 rounded-lg py-2.5 px-4 pr-10 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200">
-                </div>
-                
-                <button class="inline-flex items-center px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                    </svg>
-                    Filter
-                </button>
-                
-                <button class="inline-flex items-center px-4 py-2.5 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                    </svg>
-                    Export
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Payments Table -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="overflow-x-auto">
@@ -166,22 +109,16 @@
                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                             <div class="flex items-center">
                                 Student Details
-                                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
-                                </svg>
                             </div>
                         </th>
                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Course
+                        </th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Month Number
+                        </th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                             Payment Information
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                            Receipt
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                            Method
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                            Status
                         </th>
                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                             Actions
@@ -210,6 +147,16 @@
                             </div>
                         </td>
                         
+                        <!-- Course -->
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-900">{{ $payment->course->name ?? 'N/A' }}</div>
+                        </td>
+
+                        <!-- Month Number -->
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-900">{{ $payment->month_number }}</div>
+                        </td>
+
                         <!-- Payment Info -->
                         <td class="px-6 py-4">
                             <div class="text-lg font-bold text-gray-900">
@@ -221,78 +168,6 @@
                                 </svg>
                                 {{ $payment->payment_date->format('M d, Y') }}
                             </div>
-                        </td>
-                        
-                        <!-- Receipt Info -->
-                        <td class="px-6 py-4">
-                            <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                {{ $payment->receipt_number }}
-                            </div>
-                            <div class="text-xs text-gray-500 mt-1">
-                                @if($payment->paid_by)
-                                Paid by: {{ $payment->paid_by }}
-                                @endif
-                            </div>
-                        </td>
-                        
-                        <!-- Payment Method -->
-                        <td class="px-6 py-4">
-                            @php
-                                $methodColors = [
-                                    'cash' => 'bg-green-100 text-green-800',
-                                    'card' => 'bg-blue-100 text-blue-800',
-                                    'bank_transfer' => 'bg-purple-100 text-purple-800',
-                                    'check' => 'bg-yellow-100 text-yellow-800',
-                                    'online' => 'bg-indigo-100 text-indigo-800'
-                                ];
-                                $color = $methodColors[$payment->payment_method] ?? 'bg-gray-100 text-gray-800';
-                            @endphp
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $color }}">
-                                @switch($payment->payment_method)
-                                    @case('cash')
-                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                        </svg>
-                                        @break
-                                    @case('card')
-                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                                        </svg>
-                                        @break
-                                    @case('bank_transfer')
-                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/>
-                                        </svg>
-                                        @break
-                                    @default
-                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                                        </svg>
-                                @endswitch
-                                {{ $payment->payment_method_display }}
-                            </span>
-                        </td>
-                        
-                        <!-- Status -->
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            @if($payment->is_verified)
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                                <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                </svg>
-                                Verified
-                            </span>
-                            @else
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                Pending
-                            </span>
-                            @endif
                         </td>
                         
                         <!-- Actions -->

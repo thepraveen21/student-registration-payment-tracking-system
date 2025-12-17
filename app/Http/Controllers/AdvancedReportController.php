@@ -121,6 +121,67 @@ class AdvancedReportController extends Controller
     }
 
     /**
+     * Generate payment-wise student report.
+     */
+    public function paymentWiseStudents(Request $request)
+    {
+        $students = Student::with('course') // Keep course eager loading for `totalCourseFee`
+            ->leftJoin('monthly_payments', 'students.id', '=', 'monthly_payments.student_id') // Changed from 'payments' to 'monthly_payments'
+            ->leftJoin('payment_schedules', 'students.id', '=', 'payment_schedules.student_id')
+            ->select(
+                'students.id', 'students.course_id', 'students.center_id', 'students.registration_number',
+                'students.first_name', 'students.last_name', 'students.email', 'students.student_phone',
+                'students.parent_phone', 'students.date_of_birth', 'students.address', 'students.qr_code_path',
+                'students.status', 'students.created_at', 'students.updated_at',
+                DB::raw('COALESCE(SUM(monthly_payments.amount), 0) as total_paid_sum'), // Sum from monthly_payments
+                DB::raw('COALESCE(SUM(payment_schedules.amount_due), 0) as total_due_sum'),
+                DB::raw('MAX(CASE WHEN payment_schedules.status = "overdue" THEN 1 ELSE 0 END) as has_overdue_schedule')
+            )
+            ->groupBy(
+                'students.id', 'students.course_id', 'students.center_id', 'students.registration_number',
+                'students.first_name', 'students.last_name', 'students.email', 'students.student_phone',
+                'students.parent_phone', 'students.date_of_birth', 'students.address', 'students.qr_code_path',
+                'students.status', 'students.created_at', 'students.updated_at'
+            )
+            ->get()
+            ->map(function ($student) {
+                $totalCourseFee = $student->course->fee ?? 0;
+                $totalPaid = (float) $student->total_paid_sum;
+                // The balance is now calculated against the total course fee
+                $balance = $totalCourseFee - $totalPaid; 
+                
+                $paymentStatus = 'paid';
+                if ($balance > 0) { // If remaining amount is positive, it's pending or overdue
+                    if ($student->has_overdue_schedule) {
+                        $paymentStatus = 'overdue';
+                    } else {
+                        $paymentStatus = 'pending';
+                    }
+                } elseif ($balance < 0) { // If balance is negative, it means overpaid
+                    $paymentStatus = 'overpaid';
+                }
+                // If balance is 0, it remains 'paid'
+
+                return [
+                    'student' => $student,
+                    'total_course_fee' => $totalCourseFee,
+                    'total_paid' => $totalPaid,
+                    'total_due' => (float) $student->total_due_sum, // Keep total_due for display/context if needed
+                    'balance' => $balance,
+                    'payment_status' => $paymentStatus,
+                ];
+            })
+            ->sortBy('student.first_name');
+
+        if ($request->has('export') && $request->export == 'pdf') {
+            $pdf = PDF::loadView('admin.reports.pdf.payment-wise-students', compact('students'));
+            return $pdf->download('payment-wise-students-' . date('Y-m-d') . '.pdf');
+        }
+
+        return view('admin.reports.payment-wise-students', compact('students'));
+    }
+
+    /**
      * Generate overdue cases report.
      */
     public function overdueCases(Request $request)

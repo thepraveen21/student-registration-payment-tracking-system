@@ -10,49 +10,35 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Course;
 use App\Models\Center;
+use Zxing\QrReader;
+use Carbon\Carbon;
 
 class ReceptionPaymentController extends Controller
 {
     public function index(Request $request)
     {
-        // Load filters
         $courses = Course::all();
         $centers = Center::all();
 
-        // Base query with relations
         $query = MonthlyPayment::with(['student', 'course', 'recordedBy']);
 
-        // --------------------------
-        // Course Filter
-        // --------------------------
         if ($request->course) {
             $query->where('course_id', $request->course);
         }
 
-        // --------------------------
-        // Center Filter
-        // --------------------------
         if ($request->center) {
             $query->whereHas('student', function ($q) use ($request) {
                 $q->where('center_id', $request->center);
             });
         }
 
-        // --------------------------
-        // Search Filter (FIXED)
-        // --------------------------
-        $search = $request->search;  // ⭐ FIXED: define $search
-
-        if (!empty($search)) {
-            $query->whereHas('student', function ($q) use ($search) {
-                $q->where('first_name', 'like', "%$search%")
-                ->orWhere('last_name', 'like', "%$search%");
+        if ($request->search) {
+            $query->whereHas('student', function ($q) use ($request) {
+                $q->where('first_name', 'like', "%{$request->search}%")
+                  ->orWhere('last_name', 'like', "%{$request->search}%");
             });
         }
 
-        // --------------------------
-        // Fetch Results
-        // --------------------------
         $monthlyPayments = $query->orderBy('payment_date', 'desc')->get();
 
         return view('reception.payments.index', compact(
@@ -61,7 +47,6 @@ class ReceptionPaymentController extends Controller
             'centers'
         ));
     }
-
 
     public function create()
     {
@@ -72,27 +57,27 @@ class ReceptionPaymentController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'student_id' => 'required|exists:students,id',
-            'course_id'  => 'required|exists:courses,id',
-            'month_number' => 'required|integer|min:1|max:4',
-            'amount' => 'required|numeric|gt:0',
-            'payment_date' => 'required|date',
+            'student_id'     => 'required|exists:students,id',
+            'course_id'      => 'required|exists:courses,id',
+            'month_number'   => 'required|integer|min:1|max:12',
+            'amount'         => 'required|numeric|gt:0',
+            'payment_date'   => 'required|date', // Accept any date format
             'payment_method' => 'required|in:cash,card,bank_transfer',
-            'notes' => 'nullable|string|max:200',
+            'notes'          => 'nullable|string|max:200',
         ]);
 
         $data = $request->only([
             'student_id',
             'course_id',
             'month_number',
-            'payment_date',
             'amount',
             'notes'
         ]);
 
+        // Convert input to Carbon
+        $data['payment_date'] = Carbon::parse($request->payment_date);
         $data['recorded_by'] = Auth::id();
 
-        // Save into NEW table
         MonthlyPayment::create($data);
 
         return response()->json([
@@ -101,102 +86,41 @@ class ReceptionPaymentController extends Controller
         ]);
     }
 
-    public function show(Payment $payment)
-    {
-        return view('reception.payments.show', compact('payment'));
-    }
-
-    public function edit(Payment $payment)
-    {
-        $students = Student::all();
-        return view('reception.payments.edit', compact('payment', 'students'));
-    }
-
-    public function update(Request $request, Payment $payment)
-    {
-        $request->validate([
-            'student_id' => 'required|exists:students,id',
-            'amount' => 'required|numeric|gt:0',
-            'payment_date' => 'required|date',
-            'payment_method' => 'required|in:cash,card,bank_transfer',
-            'receipt_number' => 'nullable|string|max:100|unique:payments,receipt_number,' . $payment->id,
-            'notes' => 'nullable|string|max:200',
-        ]);
-
-        $data = $request->all();
-
-        if (empty($data['receipt_number']) && empty($payment->receipt_number)) {
-            $data['receipt_number'] = Payment::generateReceiptNumber();
-        }
-
-        $payment->update($data);
-
-        return redirect()->route('reception.payments.index')
-                         ->with('success', 'Payment updated successfully.');
-    }
-
-    public function destroy(Payment $payment)
-    {
-        $payment->delete();
-
-        return redirect()->route('reception.payments.index')
-                         ->with('success', 'Payment deleted successfully.');
-    }
-
-    public function monthlyPayments(Student $student)
-    {
-        $student->load('monthlyPayments');
-        return view('reception.payments.monthly', compact('student'));
-    }
-
-    public function storeMonthlyPayments(Request $request, Student $student)
-    {
-        $request->validate([
-            'monthly_payments' => 'required|array',
-            'monthly_payments.*.payment_date' => 'nullable|date',
-            'monthly_payments.*.amount' => 'nullable|numeric',
-            'monthly_payments.*.notes' => 'nullable|string',
-        ]);
-
-        foreach ($request->monthly_payments as $monthNumber => $paymentData) {
-            if (!empty($paymentData['payment_date']) && !empty($paymentData['amount'])) {
-                MonthlyPayment::updateOrCreate(
-                    [
-                        'student_id' => $student->id,
-                        'course_id' => $student->course_id,
-                        'month_number' => $monthNumber,
-                    ],
-                    [
-                        'payment_date' => $paymentData['payment_date'],
-                        'amount' => $paymentData['amount'],
-                        'recorded_by' => Auth::id(),
-                        'notes' => $paymentData['notes'],
-                    ]
-                );
-            }
-        }
-
-        return redirect()->route('reception.students.monthly-payments', $student)
-                         ->with('success', 'Monthly payments updated successfully.');
-    }
-
+    // ======================================================
+    // ✅ QR FIX
+    // ======================================================
     public function getStudent(Request $request)
     {
-        $request->validate([
-            'code' => 'required|string'
-        ]);
+        if ($request->hasFile('qr_image')) {
+            $request->validate([
+                'qr_image' => 'required|image|mimes:png,jpg,jpeg|max:2048'
+            ]);
 
-        $qr = trim($request->code);
-        $qr = strtoupper($qr);
+            $reader = new QrReader($request->file('qr_image')->getPathname());
+            $qrRaw = $reader->text();
 
-        // Extract filename (if scanner includes .svg or full path)
-        $justFilename = strtoupper(basename($qr)); // Example: QR00022 or QR00022.SVG
+            if (!$qrRaw) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to read QR code from image.'
+                ]);
+            }
 
-        // Fix: match against BOTH columns correctly
+        } else {
+            $request->validate([
+                'code' => 'required|string'
+            ]);
+
+            $qrRaw = $request->code;
+        }
+
+        $qrRaw = trim($qrRaw);
+        $qrRaw = str_replace(["\n", "\r", " "], '', $qrRaw);
+        $qrCode = strtoupper(pathinfo($qrRaw, PATHINFO_FILENAME));
+
         $student = Student::with(['course', 'center'])
-            ->whereRaw('UPPER(TRIM(qr_code)) = ?', [$justFilename])
-            ->orWhereRaw('UPPER(TRIM(REPLACE(qr_code_path, "qrcodes/", ""))) = ?', [$justFilename])
-            ->orWhereRaw('UPPER(TRIM(qr_code_path)) LIKE ?', ["%{$justFilename}%"])
+            ->whereRaw('UPPER(TRIM(qr_code)) = ?', [$qrCode])
+            ->orWhereRaw('UPPER(TRIM(qr_code_path)) LIKE ?', ["%{$qrCode}%"])
             ->first();
 
         if (!$student) {
@@ -225,6 +149,47 @@ class ReceptionPaymentController extends Controller
         ]);
     }
 
+    public function edit(MonthlyPayment $payment)
+    {
+        $courses = Course::all();
+        $payment_date_formatted = Carbon::parse($payment->payment_date)->format('Y-m-d\TH:i');
+
+        return view('reception.payments.edit', compact(
+            'payment',
+            'courses',
+            'payment_date_formatted'
+        ));
+    }
+
+    public function update(Request $request, MonthlyPayment $payment)
+    {
+        $request->validate([
+            'course_id'    => 'required|exists:courses,id',
+            'month_number' => 'required|integer|min:1|max:12',
+            'amount'       => 'required|numeric|gt:0',
+            'notes'        => 'nullable|string|max:200',
+        ]);
+
+        $payment->update([
+            'course_id'    => $request->course_id,
+            'month_number' => $request->month_number,
+            'amount'       => $request->amount,
+            'notes'        => $request->notes,
+        ]);
+
+        return redirect()
+            ->route('reception.payments.index')
+            ->with('success', 'Payment updated successfully.');
+    }
+
+    public function destroy(MonthlyPayment $payment)
+    {
+        $payment->delete();
+
+        return redirect()
+            ->route('reception.payments.index')
+            ->with('success', 'Payment deleted successfully.');
+    }
 
     public function paymentPopup(Student $student)
     {
