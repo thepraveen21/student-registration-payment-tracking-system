@@ -64,6 +64,32 @@ class AttendanceController extends Controller
         $courses = Course::all();
         $latestAttendance = Attendance::orderBy('attended_at', 'desc')->first();
 
+        // Determine which date to use for the top stats (selected date or today)
+        $dateForStats = $request->date ? Carbon::parse($request->date)->toDateString() : Carbon::today()->toDateString();
+
+        // Base query for counting attendances (respect filters)
+        $countQuery = Attendance::query();
+        if ($request->course) {
+            $countQuery->whereHas('student', function ($q) use ($request) {
+                $q->where('course_id', $request->course);
+            });
+        }
+
+        $todayCount = (clone $countQuery)->whereDate('attended_at', $dateForStats)->count();
+
+        // Count unique course ids for attendances on the date
+        $uniqueCourses = (clone $countQuery)
+            ->whereDate('attended_at', $dateForStats)
+            ->whereHas('student', function ($q) {
+                $q->whereNotNull('course_id');
+            })
+            ->get()
+            ->pluck('student')
+            ->map(fn($s) => $s->course->id ?? null)
+            ->filter()
+            ->unique()
+            ->count();
+
         return view('reception.attendance.index', [
             'attendances' => $attendances,
             'courses' => $courses,
@@ -71,6 +97,8 @@ class AttendanceController extends Controller
             'search' => $request->search ?? '',
             'selected_course' => $request->course ?? '',
             'selected_date' => $request->date ?? '',
+            'todayCount' => $todayCount,
+            'uniqueCourses' => $uniqueCourses,
         ]);
     }
 
