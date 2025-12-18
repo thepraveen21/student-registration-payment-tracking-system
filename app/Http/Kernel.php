@@ -59,4 +59,9 @@ class Kernel extends HttpKernel
 
 
     ];
+    protected function schedule(\Illuminate\Console\Scheduling\Schedule $schedule)
+{
+    $schedule->command('payments:check-overdue')->daily();
+}
+
 }

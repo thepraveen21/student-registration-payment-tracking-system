@@ -13,7 +13,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        \App\Console\Commands\SendOverduePaymentReminders::class,
+        // Payment overdue checking command
+        \App\Console\Commands\CheckOverduePayments::class,
     ];
 
     /**
@@ -24,7 +25,16 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('payments:send-overdue-reminders')->daily();
+        // Check for overdue payments daily at 9:00 AM
+        $schedule->command('payments:check-overdue')
+                 ->dailyAt('09:00')
+                 ->timezone('Asia/Colombo')
+                 ->onSuccess(function () {
+                     \Log::info('Payment overdue check completed successfully');
+                 })
+                 ->onFailure(function () {
+                     \Log::error('Payment overdue check failed');
+                 });
     }
 
     /**

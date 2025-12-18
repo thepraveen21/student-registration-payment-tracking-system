@@ -2,8 +2,6 @@
 
 namespace App\Mail;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -11,14 +9,18 @@ use Illuminate\Queue\SerializesModels;
 
 class PaymentOverdueMail extends Mailable
 {
-    use Queueable, SerializesModels;
+    use SerializesModels;
+    
+    public $student;
+    public $daysOverdue;
 
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct($student, $daysOverdue = 0)
     {
-        //
+        $this->student = $student;
+        $this->daysOverdue = $daysOverdue;
     }
 
     /**
@@ -27,7 +29,7 @@ class PaymentOverdueMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Payment Overdue Mail',
+            subject: 'Urgent: Class Fee Payment Reminder - Action Required',
         );
     }
 
@@ -37,17 +39,15 @@ class PaymentOverdueMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'emails.payment_overdue',
+            with: [
+                'studentName' => $this->student->first_name . ' ' . $this->student->last_name,
+                'courseName' => $this->student->course->name ?? 'N/A',
+                'centerName' => $this->student->center->name ?? 'N/A',
+                'registrationDate' => $this->student->created_at->format('F d, Y'),
+                'daysOverdue' => $this->daysOverdue,
+                'registrationNumber' => $this->student->registration_number,
+            ],
         );
-    }
-
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
-    public function attachments(): array
-    {
-        return [];
     }
 }
