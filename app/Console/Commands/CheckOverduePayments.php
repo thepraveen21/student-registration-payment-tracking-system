@@ -17,70 +17,105 @@ class CheckOverduePayments extends Command
 
     public function handle()
     {
-        $this->info('Checking for students with overdue payments...');
+        $this->info('Checking for students with overdue monthly payments...');
+        $this->info('System: 4 weeks = 1 month | Payment reminder sent during week 3 of each month');
+        $this->info('');
         
-        // Get date 3 weeks ago (21 days)
-        $threeWeeksAgo = Carbon::now()->subWeeks(3)->startOfDay();
+        $today = Carbon::now();
         
-        // Find students who:
-        // 1. Registered 3+ weeks ago (created_at <= 3 weeks ago)
-        // 2. Have no monthly payments at all
-        // 3. Are active students
-        $overdueStudents = Student::where('status', 'active')
-            ->where('created_at', '<=', $threeWeeksAgo)
-            ->whereDoesntHave('monthlyPayments')
-            ->with(['course', 'center'])
+        // Get all active students
+        $activeStudents = Student::where('status', 'active')
+            ->with(['course', 'center', 'monthlyPayments'])
             ->get();
         
         $emailsSent = 0;
         $emailsFailed = 0;
+        $studentsChecked = 0;
         
-        foreach ($overdueStudents as $student) {
+        foreach ($activeStudents as $student) {
+            $registrationDate = Carbon::parse($student->created_at);
+            $daysSinceRegistration = $registrationDate->diffInDays($today);
+            
+            // Calculate current month (4 weeks = 1 month = 28 days)
+            $currentMonthNumber = floor($daysSinceRegistration / 28) + 1;
+            
+            // Only check months 1-4 (4 months course)
+            if ($currentMonthNumber > 4) {
+                continue;
+            }
+            
+            // Calculate which day of the current month cycle (0-27)
+            $dayInCurrentMonth = $daysSinceRegistration % 28;
+            
+            // Week 3 = days 14-20 (0-indexed, so checking 14-20)
+            $isWeek3 = ($dayInCurrentMonth >= 14 && $dayInCurrentMonth <= 20);
+            
+            if (!$isWeek3) {
+                continue; // Not in week 3, skip this student
+            }
+            
+            $studentsChecked++;
+            
+            // Check if payment exists for current month
+            $paymentExists = $student->monthlyPayments()
+                ->where('month_number', $currentMonthNumber)
+                ->exists();
+            
+            if ($paymentExists) {
+                $this->info("  ✓ {$student->first_name} {$student->last_name} - Month {$currentMonthNumber} - Already paid");
+                continue; // Payment exists, no reminder needed
+            }
+            
+            // No payment for current month, send reminder
             try {
-                // Calculate how many days overdue
-                $registrationDate = Carbon::parse($student->created_at);
-                $dueDate = $registrationDate->copy()->addWeeks(3);
-                $daysOverdue = Carbon::now()->diffInDays($dueDate, false) * -1;
-                
-                if ($daysOverdue > 0) {
-                    // Only send if email is valid
-                    if (filter_var($student->email, FILTER_VALIDATE_EMAIL)) {
-                        Mail::to($student->email)->send(new PaymentOverdueMail($student, $daysOverdue));
-                        
-                        $this->info("✓ Sent reminder to: {$student->first_name} {$student->last_name} ({$student->email}) - {$daysOverdue} days overdue");
-                        $emailsSent++;
-                        
-                        // Log the action
-                        Log::info('Payment overdue email sent', [
-                            'student_id' => $student->id,
-                            'student_name' => $student->first_name . ' ' . $student->last_name,
-                            'email' => $student->email,
-                            'registration_date' => $registrationDate->format('Y-m-d'),
-                            'days_overdue' => $daysOverdue,
-                        ]);
-                    } else {
-                        $this->warn("✗ Invalid email for: {$student->first_name} {$student->last_name} ({$student->email})");
-                        $emailsFailed++;
-                    }
+                if (filter_var($student->email, FILTER_VALIDATE_EMAIL)) {
+                    
+                    $daysIntoWeek3 = $dayInCurrentMonth - 14 + 1; // Days into week 3
+                    
+                    Mail::to($student->email)->send(new PaymentOverdueMail(
+                        $student, 
+                        $daysIntoWeek3,
+                        $currentMonthNumber
+                    ));
+                    
+                    $this->info("  ✓ Sent reminder to: {$student->first_name} {$student->last_name} ({$student->email})");
+                    $this->info("    Month {$currentMonthNumber} - Week 3, Day {$daysIntoWeek3}");
+                    $emailsSent++;
+                    
+                    // Log the action
+                    Log::info('Monthly payment reminder sent', [
+                        'student_id' => $student->id,
+                        'student_name' => $student->first_name . ' ' . $student->last_name,
+                        'email' => $student->email,
+                        'month_number' => $currentMonthNumber,
+                        'days_since_registration' => $daysSinceRegistration,
+                        'day_in_month' => $dayInCurrentMonth,
+                        'registration_date' => $registrationDate->format('Y-m-d'),
+                    ]);
+                } else {
+                    $this->warn("  ✗ Invalid email for: {$student->first_name} {$student->last_name} ({$student->email})");
+                    $emailsFailed++;
                 }
             } catch (\Exception $e) {
-                $this->error("✗ Failed to send email to {$student->email}: {$e->getMessage()}");
+                $this->error("  ✗ Failed to send email to {$student->email}: {$e->getMessage()}");
                 $emailsFailed++;
                 
-                Log::error('Failed to send payment overdue email', [
+                Log::error('Failed to send monthly payment reminder', [
                     'student_id' => $student->id,
                     'email' => $student->email,
+                    'month_number' => $currentMonthNumber,
                     'error' => $e->getMessage(),
                 ]);
             }
         }
         
-        $this->info("\n" . str_repeat('=', 50));
+        $this->info("\n" . str_repeat('=', 60));
         $this->info("Summary:");
-        $this->info("  Total overdue students: " . $overdueStudents->count());
-        $this->info("  Emails sent: {$emailsSent}");
-        $this->info("  Emails failed: {$emailsFailed}");
-        $this->info(str_repeat('=', 50));
+        $this->info("  Active students: " . $activeStudents->count());
+        $this->info("  Students in week 3 of their month: {$studentsChecked}");
+        $this->info("  Reminder emails sent: {$emailsSent}");
+        $this->info("  Failed: {$emailsFailed}");
+        $this->info(str_repeat('=', 60));
         
         return Command::SUCCESS;
     }

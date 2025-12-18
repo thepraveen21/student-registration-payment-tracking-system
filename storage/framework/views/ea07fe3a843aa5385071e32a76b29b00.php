@@ -120,7 +120,7 @@
     <div class="email-container">
         <!-- Header -->
         <div class="header">
-            <h1>⚠️ Payment Reminder</h1>
+            <h1>⚠️ Payment Reminder - Month <?php echo e($monthNumber); ?></h1>
             <p style="margin: 10px 0 0 0; font-size: 16px;">Class Fee Payment Required</p>
         </div>
 
@@ -128,13 +128,13 @@
         <div class="content">
             <p>Dear <strong><?php echo e($studentName); ?></strong>,</p>
 
-            <p>We hope this email finds you well. This is a friendly reminder regarding your class fee payment for the course you enrolled in.</p>
+            <p>This is a reminder regarding your class fee payment for <strong style="background: #667eea; color: white; padding: 4px 12px; border-radius: 12px; font-size: 14px;">Month <?php echo e($monthNumber); ?></strong></p>
 
             <div class="alert-box">
-                <strong>⏰ Payment Overdue:</strong> Your payment is now <span class="highlight"><?php echo e($daysOverdue); ?> day<?php echo e($daysOverdue > 1 ? 's' : ''); ?> overdue</span>.
+                <strong>⏰ Payment Pending:</strong> You are currently in <span class="highlight">week 3 of Month <?php echo e($monthNumber); ?></span> (<?php echo e($daysOverdue); ?> days since registration). We have not yet received your payment for this month.
             </div>
 
-            <p>According to our records, you registered for the course on <strong><?php echo e($registrationDate); ?></strong>. As per our policy, the first month's class fee should be paid within <strong>3 weeks (21 days)</strong> from the registration date.</p>
+            <p>According to our records, you registered for the course on <strong><?php echo e($registrationDate); ?></strong>. As per our policy, each month consists of <strong>4 weeks (28 days)</strong>, and payment should be completed by the end of week 3 to avoid service disruption.</p>
 
             <!-- Student Information -->
             <div class="info-box">
@@ -156,13 +156,21 @@
                     <span class="info-value"><?php echo e($registrationDate); ?></span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">Payment Due Date:</span>
-                    <span class="info-value highlight"><?php echo e(\Carbon\Carbon::parse($registrationDate)->addWeeks(3)->format('F d, Y')); ?></span>
+                    <span class="info-label">Days Since Registration:</span>
+                    <span class="info-value"><?php echo e($daysOverdue); ?> days</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Current Month:</span>
+                    <span class="info-value highlight">Month <?php echo e($monthNumber); ?></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Payment Status:</span>
+                    <span class="info-value highlight">Not Paid for Month <?php echo e($monthNumber); ?></span>
                 </div>
             </div>
 
             <h3 style="color: #667eea;">💳 How to Make Payment</h3>
-            <p>Please visit our center or contact our reception to complete your payment. You can make the payment through:</p>
+            <p>Please visit our center or contact our reception to complete your <strong>Month <?php echo e($monthNumber); ?></strong> payment. You can make the payment through:</p>
             <ul>
                 <li>Cash payment at the center</li>
                 <li>Bank transfer</li>
@@ -174,8 +182,8 @@
             </p>
 
             <div style="background-color: #e7f3ff; border-left: 4px solid #2196F3; padding: 15px; margin: 20px 0; border-radius: 5px;">
-                <strong>ℹ️ Important Note:</strong><br>
-                Timely payment ensures uninterrupted access to your classes and course materials. If you have already made the payment, please disregard this reminder or contact us with your payment proof.
+                <strong>ℹ️ Payment Policy:</strong><br>
+                Each month consists of 4 weeks (28 days). You should complete your payment by the end of week 3 of each month to continue your classes without interruption. Timely payment ensures uninterrupted access to your classes and course materials. If you have already made the payment for Month <?php echo e($monthNumber); ?>, please disregard this reminder or contact us with your payment proof.
             </div>
 
             <p>If you have any questions or need assistance, please don't hesitate to reach out to us. We're here to help!</p>

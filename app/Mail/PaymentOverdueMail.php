@@ -14,13 +14,16 @@ class PaymentOverdueMail extends Mailable
     public $student;
     public $daysOverdue;
 
+    public $monthNumber;
+
     /**
      * Create a new message instance.
      */
-    public function __construct($student, $daysOverdue = 0)
+    public function __construct($student, $daysOverdue = 0, $monthNumber = 1)
     {
         $this->student = $student;
         $this->daysOverdue = $daysOverdue;
+        $this->monthNumber = $monthNumber;
     }
 
     /**
@@ -46,6 +49,7 @@ class PaymentOverdueMail extends Mailable
                 'centerName' => $this->student->center->name ?? 'N/A',
                 'registrationDate' => $this->student->created_at->format('F d, Y'),
                 'daysOverdue' => $this->daysOverdue,
+                'monthNumber' => $this->monthNumber,
                 'registrationNumber' => $this->student->registration_number,
             ],
         );
