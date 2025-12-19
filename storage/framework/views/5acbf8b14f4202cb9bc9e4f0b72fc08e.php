@@ -1,9 +1,7 @@
-@extends('layouts.reception')
+<?php $__env->startSection('header', 'Add New Course'); ?>
+<?php $__env->startSection('title', 'Course Management'); ?>
 
-@section('header', 'Add New Course')
-@section('title', 'Course Management')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 md:py-6 lg:py-8">
     <!-- Header Section -->
     <div class="mb-4 md:mb-6 lg:mb-8">
@@ -13,7 +11,7 @@
                 <p class="mt-1 text-xs md:text-sm text-gray-600">Add a new training course to the system</p>
             </div>
             <div class="mt-3 sm:mt-0">
-                <a href="{{ route('reception.dashboard') ?? url()->previous() }}" 
+                <a href="<?php echo e(route('reception.dashboard') ?? url()->previous()); ?>" 
                    class="inline-flex items-center px-3 py-2 md:px-4 md:py-2.5 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-sm md:text-base">
                     <svg class="w-4 h-4 md:w-5 md:h-5 mr-1.5 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
@@ -24,7 +22,7 @@
         </div>
         
         <!-- Success Message -->
-        @if (session('success'))
+        <?php if(session('success')): ?>
         <div class="mt-4 md:mt-6 p-3 md:p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 rounded-lg shadow-sm" role="alert">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -33,14 +31,14 @@
                     </svg>
                 </div>
                 <div class="ml-2 md:ml-3">
-                    <p class="text-xs md:text-sm font-medium text-green-800">{{ session('success') }}</p>
+                    <p class="text-xs md:text-sm font-medium text-green-800"><?php echo e(session('success')); ?></p>
                 </div>
             </div>
         </div>
-        @endif
+        <?php endif; ?>
 
         <!-- Error Messages -->
-        @if ($errors->any())
+        <?php if($errors->any()): ?>
         <div class="mt-4 md:mt-6 p-3 md:p-4 bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-lg shadow-sm" role="alert">
             <div class="flex">
                 <div class="flex-shrink-0">
@@ -49,18 +47,18 @@
                     </svg>
                 </div>
                 <div class="ml-2 md:ml-3">
-                    <h3 class="text-xs md:text-sm font-medium text-red-800">There were {{ $errors->count() }} error(s) with your submission</h3>
+                    <h3 class="text-xs md:text-sm font-medium text-red-800">There were <?php echo e($errors->count()); ?> error(s) with your submission</h3>
                     <div class="mt-2 text-xs md:text-sm text-red-700">
                         <ul class="list-disc pl-4 md:pl-5 space-y-1">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
+                            <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <li><?php echo e($error); ?></li>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </ul>
                     </div>
                 </div>
             </div>
         </div>
-        @endif
+        <?php endif; ?>
     </div>
 
     <!-- Form Section -->
@@ -76,8 +74,8 @@
         </div>
         
         <div class="p-3 md:p-4 lg:p-6">
-            <form action="{{ route('courses.store') }}" method="POST" class="space-y-4 md:space-y-5 lg:space-y-6">
-                @csrf
+            <form action="<?php echo e(route('courses.store')); ?>" method="POST" class="space-y-4 md:space-y-5 lg:space-y-6">
+                <?php echo csrf_field(); ?>
 
                 <!-- Course Name Field -->
                 <div class="space-y-1 md:space-y-2">
@@ -94,20 +92,35 @@
                         <input type="text" 
                                id="name" 
                                name="name" 
-                               value="{{ old('name') }}"
-                               class="block w-full pl-8 md:pl-10 pr-3 py-1.5 md:py-2 lg:py-2.5 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-sm md:text-base @error('name') border-red-300 focus:ring-red-500 focus:border-red-500 @enderror"
+                               value="<?php echo e(old('name')); ?>"
+                               class="block w-full pl-8 md:pl-10 pr-3 py-1.5 md:py-2 lg:py-2.5 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-sm md:text-base <?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-300 focus:ring-red-500 focus:border-red-500 <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                placeholder="Enter course name"
                                required
                                autofocus>
                     </div>
-                    @error('name')
+                    <?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                     <div class="flex items-center mt-1 text-red-600 text-xs md:text-sm">
                         <svg class="w-3 h-3 md:w-4 md:h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
                         </svg>
-                        {{ $message }}
+                        <?php echo e($message); ?>
+
                     </div>
-                    @enderror
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <!-- Description Field -->
@@ -124,18 +137,33 @@
                         <textarea id="description" 
                                   name="description" 
                                   rows="3" md:rows="4"
-                                  class="block w-full pl-7 md:pl-10 pr-3 py-1.5 md:py-2 lg:py-2.5 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-sm md:text-base @error('description') border-red-300 focus:ring-red-500 focus:border-red-500 @enderror"
-                                  placeholder="Enter course description">{{ old('description') }}</textarea>
+                                  class="block w-full pl-7 md:pl-10 pr-3 py-1.5 md:py-2 lg:py-2.5 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-sm md:text-base <?php $__errorArgs = ['description'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-300 focus:ring-red-500 focus:border-red-500 <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                  placeholder="Enter course description"><?php echo e(old('description')); ?></textarea>
                     </div>
                     <p class="text-xs text-gray-500 mt-1">Provide a brief description of the course</p>
-                    @error('description')
+                    <?php $__errorArgs = ['description'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                     <div class="flex items-center mt-1 text-red-600 text-xs md:text-sm">
                         <svg class="w-3 h-3 md:w-4 md:h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
                         </svg>
-                        {{ $message }}
+                        <?php echo e($message); ?>
+
                     </div>
-                    @enderror
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <!-- Price and Duration Fields (Side by side on desktop) -->
@@ -155,21 +183,36 @@
                             <input type="number" 
                                    id="price" 
                                    name="price" 
-                                   value="{{ old('price') }}"
+                                   value="<?php echo e(old('price')); ?>"
                                    step="0.01"
                                    min="0"
-                                   class="block w-full pl-7 md:pl-10 pr-3 py-1.5 md:py-2 lg:py-2.5 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-sm md:text-base @error('price') border-red-300 focus:ring-red-500 focus:border-red-500 @enderror"
+                                   class="block w-full pl-7 md:pl-10 pr-3 py-1.5 md:py-2 lg:py-2.5 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-sm md:text-base <?php $__errorArgs = ['price'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-300 focus:ring-red-500 focus:border-red-500 <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                    placeholder="0.00"
                                    required>
                         </div>
-                        @error('price')
+                        <?php $__errorArgs = ['price'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                         <div class="flex items-center mt-1 text-red-600 text-xs md:text-sm">
                             <svg class="w-3 h-3 md:w-4 md:h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
                             </svg>
-                            {{ $message }}
+                            <?php echo e($message); ?>
+
                         </div>
-                        @enderror
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
 
                     <!-- Duration Field -->
@@ -187,20 +230,35 @@
                             <input type="text" 
                                    id="duration" 
                                    name="duration" 
-                                   value="{{ old('duration') }}"
-                                   class="block w-full pl-7 md:pl-10 pr-3 py-1.5 md:py-2 lg:py-2.5 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-sm md:text-base @error('duration') border-red-300 focus:ring-red-500 focus:border-red-500 @enderror"
+                                   value="<?php echo e(old('duration')); ?>"
+                                   class="block w-full pl-7 md:pl-10 pr-3 py-1.5 md:py-2 lg:py-2.5 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-sm md:text-base <?php $__errorArgs = ['duration'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-300 focus:ring-red-500 focus:border-red-500 <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                    placeholder="e.g., 3 Months, 1 Year"
                                    required>
                         </div>
                         <p class="text-xs text-gray-500 mt-1">Examples: 3 Months, 6 Weeks, 1 Year</p>
-                        @error('duration')
+                        <?php $__errorArgs = ['duration'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                         <div class="flex items-center mt-1 text-red-600 text-xs md:text-sm">
                             <svg class="w-3 h-3 md:w-4 md:h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
                             </svg>
-                            {{ $message }}
+                            <?php echo e($message); ?>
+
                         </div>
-                        @enderror
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                 </div>
 
@@ -224,7 +282,7 @@
                             <input type="number" 
                                    id="max_students" 
                                    name="max_students" 
-                                   value="{{ old('max_students') }}"
+                                   value="<?php echo e(old('max_students')); ?>"
                                    min="1"
                                    class="block w-full px-2 md:px-3 py-1.5 md:py-2 lg:py-2.5 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-sm md:text-base"
                                    placeholder="Optional">
@@ -239,9 +297,9 @@
                             <select id="status" 
                                     name="status"
                                     class="block w-full px-2 md:px-3 py-1.5 md:py-2 lg:py-2.5 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-sm md:text-base appearance-none">
-                                <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
-                                <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
-                                <option value="upcoming" {{ old('status') == 'upcoming' ? 'selected' : '' }}>Upcoming</option>
+                                <option value="active" <?php echo e(old('status') == 'active' ? 'selected' : ''); ?>>Active</option>
+                                <option value="inactive" <?php echo e(old('status') == 'inactive' ? 'selected' : ''); ?>>Inactive</option>
+                                <option value="upcoming" <?php echo e(old('status') == 'upcoming' ? 'selected' : ''); ?>>Upcoming</option>
                             </select>
                         </div>
                     </div>
@@ -829,4 +887,5 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize', adjustFormLayout);
 });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.reception', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\Project\Student Management System\resources\views/courses/create.blade.php ENDPATH**/ ?>

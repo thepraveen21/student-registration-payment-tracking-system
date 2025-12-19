@@ -238,6 +238,22 @@
                 </tbody>
             </table>
         </div>
+        
+        <!-- Pagination -->
+        @if($students->hasPages())
+        <div class="px-4 md:px-6 py-3 md:py-4 bg-gray-50 border-t border-gray-200">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div class="text-xs md:text-sm text-gray-700 mb-3 sm:mb-0">
+                    Showing <span class="font-semibold">{{ $students->firstItem() }}</span> to 
+                    <span class="font-semibold">{{ $students->lastItem() }}</span> of 
+                    <span class="font-semibold">{{ $students->total() }}</span> students
+                </div>
+                <div class="flex items-center">
+                    {{ $students->appends(request()->query())->onEachSide(1)->links() }}
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
 
     <!-- Monthly Payment Report Section -->

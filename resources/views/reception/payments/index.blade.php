@@ -388,12 +388,17 @@
         @endforelse
 
         @if($monthlyPayments->count())
-            <!-- Stats Footer -->
+            <!-- Pagination -->
             <div class="px-4 md:px-6 py-3 md:py-4 bg-gray-50 border-t border-gray-200">
-                <div class="text-xs md:text-sm text-gray-700 flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0">
-                    <span>Showing <span class="font-semibold">{{ $monthlyPayments->count() }}</span> payment records</span>
-                    <span class="hidden sm:inline mx-2">•</span>
-                    <span>Total Amount: <span class="font-semibold text-green-700">Rs. {{ number_format($monthlyPayments->sum('amount'), 2) }}</span></span>
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                    <div class="text-xs md:text-sm text-gray-700 mb-3 sm:mb-0">
+                        Showing <span class="font-semibold">{{ $monthlyPayments->firstItem() }}</span> to 
+                        <span class="font-semibold">{{ $monthlyPayments->lastItem() }}</span> of 
+                        <span class="font-semibold">{{ $monthlyPayments->total() }}</span> payments
+                    </div>
+                    <div class="flex items-center">
+                        {{ $monthlyPayments->appends(request()->query())->onEachSide(1)->links() }}
+                    </div>
                 </div>
             </div>
         @endif

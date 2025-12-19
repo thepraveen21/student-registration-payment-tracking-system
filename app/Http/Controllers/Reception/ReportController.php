@@ -27,7 +27,8 @@ class ReportController extends Controller
             ->when($courseId, fn($q) => $q->where('course_id', $courseId))
             ->orderBy('first_name')
             ->orderBy('last_name')
-            ->get();
+            ->paginate(20)
+            ->appends($request->all());
 
         if ($students->isEmpty()) {
             return view('reception.reports.index', [

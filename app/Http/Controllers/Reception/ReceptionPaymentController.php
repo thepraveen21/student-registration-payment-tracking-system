@@ -39,7 +39,7 @@ class ReceptionPaymentController extends Controller
             });
         }
 
-        $monthlyPayments = $query->orderBy('payment_date', 'desc')->get();
+        $monthlyPayments = $query->orderBy('payment_date', 'desc')->paginate(15)->appends($request->all());
 
         return view('reception.payments.index', compact(
             'monthlyPayments',

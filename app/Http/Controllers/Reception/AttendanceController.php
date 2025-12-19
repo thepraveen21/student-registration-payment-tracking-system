@@ -22,10 +22,12 @@ class AttendanceController extends Controller
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
             $query->whereHas('student', function($q) use ($search) {
-                $q->where('first_name', 'like', '%' . $search . '%')
-                  ->orWhere('last_name', 'like', '%' . $search . '%')
-                  ->orWhere('email', 'like', '%' . $search . '%')
-                  ->orWhere('registration_number', 'like', '%' . $search . '%');
+                $q->where(function($subQuery) use ($search) {
+                    $subQuery->where('first_name', 'like', '%' . $search . '%')
+                             ->orWhere('last_name', 'like', '%' . $search . '%')
+                             ->orWhere('email', 'like', '%' . $search . '%')
+                             ->orWhere('registration_number', 'like', '%' . $search . '%');
+                });
             });
         }
 
@@ -40,7 +42,7 @@ class AttendanceController extends Controller
         }
 
         // Paginate results
-        $attendances = $query->paginate(15);
+        $attendances = $query->paginate(15)->appends($request->all());
 
         // Group AFTER pagination
         $groupedAttendances = $attendances->getCollection()

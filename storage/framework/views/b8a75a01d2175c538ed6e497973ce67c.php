@@ -241,6 +241,23 @@
                 </tbody>
             </table>
         </div>
+        
+        <!-- Pagination -->
+        <?php if($students->hasPages()): ?>
+        <div class="px-4 md:px-6 py-3 md:py-4 bg-gray-50 border-t border-gray-200">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div class="text-xs md:text-sm text-gray-700 mb-3 sm:mb-0">
+                    Showing <span class="font-semibold"><?php echo e($students->firstItem()); ?></span> to 
+                    <span class="font-semibold"><?php echo e($students->lastItem()); ?></span> of 
+                    <span class="font-semibold"><?php echo e($students->total()); ?></span> students
+                </div>
+                <div class="flex items-center">
+                    <?php echo e($students->appends(request()->query())->onEachSide(1)->links()); ?>
+
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
 
     <!-- Monthly Payment Report Section -->

@@ -1,9 +1,9 @@
-@extends('layouts.reception')
 
-@section('header', 'Print QR Codes')
-@section('title', 'Print QR Codes')
 
-@section('content')
+<?php $__env->startSection('header', 'Print QR Codes'); ?>
+<?php $__env->startSection('title', 'Print QR Codes'); ?>
+
+<?php $__env->startSection('content'); ?>
 <div class="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 md:py-6 lg:py-8">
     <!-- Header Section -->
     <div class="mb-4 md:mb-6 lg:mb-8">
@@ -13,7 +13,7 @@
                 <p class="mt-1 text-xs md:text-sm text-gray-600">Generate and print unassigned QR codes</p>
             </div>
             <div class="mt-3 sm:mt-0">
-                <a href="{{ route('reception.qrcodes.manage') }}" 
+                <a href="<?php echo e(route('reception.qrcodes.manage')); ?>" 
                    class="inline-flex items-center px-3 py-2 md:px-4 md:py-2.5 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-sm md:text-base">
                     <svg class="w-4 h-4 md:w-5 md:h-5 mr-1.5 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
@@ -24,7 +24,7 @@
         </div>
         
         <!-- Success Message -->
-        @if (session('success'))
+        <?php if(session('success')): ?>
         <div class="mt-4 md:mt-6 p-3 md:p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 rounded-lg shadow-sm" role="alert">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -33,11 +33,11 @@
                     </svg>
                 </div>
                 <div class="ml-2 md:ml-3">
-                    <p class="text-xs md:text-sm font-medium text-green-800">{{ session('success') }}</p>
+                    <p class="text-xs md:text-sm font-medium text-green-800"><?php echo e(session('success')); ?></p>
                 </div>
             </div>
         </div>
-        @endif
+        <?php endif; ?>
     </div>
 
     <!-- Control Section -->
@@ -63,21 +63,21 @@
                 <svg class="w-3 h-3 md:w-4 md:h-4 inline mr-1 md:mr-1.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <span class="truncate">{{ $unassignedCodes->count() }} unassigned QR codes available</span>
+                <span class="truncate"><?php echo e($unassignedCodes->count()); ?> unassigned QR codes available</span>
             </div>
         </div>
     </div>
 
     <!-- QR Codes Grid -->
     <div id="printArea" class="bg-white rounded-xl shadow-sm border border-gray-200 p-3 md:p-4 lg:p-6">
-        @if($unassignedCodes->count() > 0)
+        <?php if($unassignedCodes->count() > 0): ?>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
-            @foreach($unassignedCodes as $qrCode)
+            <?php $__currentLoopData = $unassignedCodes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $qrCode): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="qr-code-card border border-gray-200 rounded-xl p-3 md:p-4 hover:border-blue-300 hover:shadow-md transition-all duration-200 group flex flex-col">
                 <label class="inline-flex items-center mb-2 md:mb-3 lg:mb-4 cursor-pointer">
                     <input type="checkbox" 
                            name="qr_codes[]" 
-                           value="{{ $qrCode->id }}" 
+                           value="<?php echo e($qrCode->id); ?>" 
                            class="qr-checkbox h-4 w-4 md:h-5 md:w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 focus:ring-2 transition-colors duration-200">
                     <span class="ml-2 md:ml-3 text-xs md:text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors duration-200 truncate">
                         Select for printing
@@ -88,28 +88,31 @@
                     <div class="w-full max-w-[200px] mx-auto flex items-center justify-center p-1">
                         <div class="bg-white p-2 md:p-3 rounded-lg border border-gray-100 shadow-inner w-full aspect-square flex items-center justify-center">
                             <div class="w-full h-full flex items-center justify-center">
-                                {!! QrCode::size(150)->margin(1)->generate(route('student.verify', $qrCode->code)) !!}
+                                <?php echo QrCode::size(150)->margin(1)->generate(route('student.verify', $qrCode->code)); ?>
+
                             </div>
                         </div>
                     </div>
                     
                     <div class="w-full text-center mt-2 md:mt-3">
                         <div class="font-mono text-xs md:text-sm font-semibold text-gray-900 bg-gray-50 py-1 md:py-2 px-2 md:px-3 rounded-lg break-all leading-tight">
-                            {{ $qrCode->code }}
+                            <?php echo e($qrCode->code); ?>
+
                         </div>
                         
                         <div class="flex items-center justify-center text-xs text-gray-500 mt-1 md:mt-2">
                             <svg class="w-3 h-3 md:w-4 md:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            {{ $qrCode->created_at->format('M d, Y') }}
+                            <?php echo e($qrCode->created_at->format('M d, Y')); ?>
+
                         </div>
                     </div>
                 </div>
             </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
-        @else
+        <?php else: ?>
         <div class="py-8 md:py-10 lg:py-12 text-center">
             <div class="flex flex-col items-center justify-center">
                 <svg class="w-12 h-12 md:w-16 md:h-16 text-gray-300 mb-3 md:mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,7 +120,7 @@
                 </svg>
                 <p class="text-sm md:text-base lg:text-lg font-medium text-gray-900 mb-1 md:mb-2">No unassigned QR codes available</p>
                 <p class="text-xs md:text-sm text-gray-600 mb-4 md:mb-6 max-w-md mx-auto px-4">Generate new QR codes to start printing</p>
-                <a href="{{ route('reception.qrcodes.manage') }}" 
+                <a href="<?php echo e(route('reception.qrcodes.manage')); ?>" 
                    class="inline-flex items-center px-3 py-2 md:px-4 md:py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 text-sm md:text-base">
                     <svg class="w-4 h-4 md:w-5 md:h-5 mr-1.5 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -126,7 +129,7 @@
                 </a>
             </div>
         </div>
-        @endif
+        <?php endif; ?>
     </div>
 </div>
 
@@ -834,4 +837,5 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.reception', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\Project\Student Management System\resources\views/reception/qrcodes/print-batch.blade.php ENDPATH**/ ?>
