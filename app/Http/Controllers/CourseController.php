@@ -35,9 +35,10 @@ class CourseController extends Controller
             'name' => 'required|string|max:255|unique:courses,name',
             'description' => 'nullable|string',
             'duration' => 'required|string|max:255',
+            'fee' => 'required|numeric|min:0',
         ]);
 
-        Course::create($request->only(['name', 'description', 'duration']));
+        Course::create($request->only(['name', 'description', 'duration', 'fee']));
 
         return redirect()->back()->with('success', 'Course created successfully!');
     }
