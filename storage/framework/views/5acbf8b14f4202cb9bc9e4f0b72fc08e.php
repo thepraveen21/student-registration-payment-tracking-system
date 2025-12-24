@@ -166,61 +166,12 @@ endif;
 unset($__errorArgs, $__bag); ?>
                 </div>
 
-                <!-- Price and Duration Fields (Side by side on desktop) -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 lg:gap-6">
-                    <!-- Price Field -->
-                    <div class="space-y-1 md:space-y-2">
-                        <label for="price" class="block text-xs md:text-sm font-medium text-gray-700">
-                            Price (Rs.)
-                            <span class="text-red-500">*</span>
-                        </label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-2 md:pl-3 flex items-center pointer-events-none">
-                                <svg class="h-4 w-4 md:h-5 md:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                            <input type="number" 
-                                   id="price" 
-                                   name="price" 
-                                   value="<?php echo e(old('price')); ?>"
-                                   step="0.01"
-                                   min="0"
-                                   class="block w-full pl-7 md:pl-10 pr-3 py-1.5 md:py-2 lg:py-2.5 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-sm md:text-base <?php $__errorArgs = ['price'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> border-red-300 focus:ring-red-500 focus:border-red-500 <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>"
-                                   placeholder="0.00"
-                                   required>
-                        </div>
-                        <?php $__errorArgs = ['price'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                        <div class="flex items-center mt-1 text-red-600 text-xs md:text-sm">
-                            <svg class="w-3 h-3 md:w-4 md:h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                            </svg>
-                            <?php echo e($message); ?>
-
-                        </div>
-                        <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-                    </div>
-
-                    <!-- Duration Field -->
-                    <div class="space-y-1 md:space-y-2">
-                        <label for="duration" class="block text-xs md:text-sm font-medium text-gray-700">
-                            Duration
-                            <span class="text-red-500">*</span>
-                        </label>
+                <!-- Duration Field -->
+                <div class="space-y-1 md:space-y-2">
+                    <label for="duration" class="block text-xs md:text-sm font-medium text-gray-700">
+                        Duration
+                        <span class="text-red-500">*</span>
+                    </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-2 md:pl-3 flex items-center pointer-events-none">
                                 <svg class="h-4 w-4 md:h-5 md:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -330,6 +281,110 @@ unset($__errorArgs, $__bag); ?>
             </form>
         </div>
     </div>
+
+    <!-- Courses List Section -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mt-6">
+        <div class="px-3 md:px-4 lg:px-6 py-3 md:py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <svg class="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-gray-600 mr-2 md:mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                    <div>
+                        <h2 class="text-sm md:text-base lg:text-lg font-semibold text-gray-900">All Courses</h2>
+                        <p class="text-xs md:text-sm text-gray-600 mt-0.5">Manage existing courses</p>
+                    </div>
+                </div>
+                <span class="px-2 md:px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs md:text-sm font-semibold">
+                    <?php echo e($courses->count()); ?> <?php echo e($courses->count() === 1 ? 'Course' : 'Courses'); ?>
+
+                </span>
+            </div>
+        </div>
+        
+        <div class="p-3 md:p-4 lg:p-6">
+            <?php if($courses->isEmpty()): ?>
+                <div class="text-center py-8 md:py-12">
+                    <svg class="mx-auto h-12 w-12 md:h-16 md:w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                    <h3 class="mt-2 text-sm md:text-base font-semibold text-gray-900">No courses yet</h3>
+                    <p class="mt-1 text-xs md:text-sm text-gray-500">Get started by creating a new course above.</p>
+                </div>
+            <?php else: ?>
+                <div class="space-y-2 md:space-y-3">
+                    <?php $__currentLoopData = $courses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="flex items-center justify-between p-3 md:p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow duration-200 bg-white hover:bg-gray-50">
+                            <div class="flex-1 min-w-0 mr-3">
+                                <div class="flex items-center space-x-2 md:space-x-3">
+                                    <div class="flex-shrink-0">
+                                        <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                                            <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h3 class="text-sm md:text-base font-semibold text-gray-900 truncate"><?php echo e($course->name); ?></h3>
+                                        <?php if($course->description): ?>
+                                            <p class="text-xs md:text-sm text-gray-600 mt-0.5 truncate"><?php echo e(Str::limit($course->description, 60)); ?></p>
+                                        <?php endif; ?>
+                                        <div class="flex flex-wrap items-center gap-2 md:gap-3 mt-1">
+                                            <?php if($course->duration): ?>
+                                                <div class="flex items-center text-xs text-gray-500">
+                                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                    <?php echo e($course->duration); ?>
+
+                                                </div>
+                                            <?php endif; ?>
+                                            <div class="flex items-center text-xs text-gray-500">
+                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                                                </svg>
+                                                <?php echo e($course->students_count ?? 0); ?> students
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <form action="<?php echo e(route('courses.destroy', $course->id)); ?>" method="POST" class="delete-course-form inline-block" data-course-name="<?php echo e($course->name); ?>" data-student-count="<?php echo e($course->students_count ?? 0); ?>">
+                                    <?php echo csrf_field(); ?>
+                                    <?php echo method_field('DELETE'); ?>
+                                    <button type="button" 
+                                            class="delete-course-btn inline-flex items-center px-2 md:px-3 py-1.5 md:py-2 bg-red-600 hover:bg-red-700 text-white text-xs md:text-sm font-medium rounded-lg shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200"
+                                            title="Delete course">
+                                        <svg class="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                        <span class="hidden sm:inline">Delete</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- Error Message Alert -->
+    <?php if(session('error')): ?>
+    <div class="mt-4 md:mt-6 p-3 md:p-4 bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-lg shadow-sm" role="alert">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-4 w-4 md:h-5 md:w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div class="ml-2 md:ml-3">
+                <p class="text-xs md:text-sm font-medium text-red-800"><?php echo e(session('error')); ?></p>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
 </div>
 
 <style>
@@ -610,6 +665,38 @@ unset($__errorArgs, $__bag); ?>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Delete course confirmation
+    const deleteCourseBtns = document.querySelectorAll('.delete-course-btn');
+    deleteCourseBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = this.closest('.delete-course-form');
+            const courseName = form.dataset.courseName;
+            const studentCount = parseInt(form.dataset.studentCount);
+            
+            let message = `Are you sure you want to delete "${courseName}"?`;
+            
+            if (studentCount > 0) {
+                message = `Cannot delete "${courseName}" because it has ${studentCount} student(s) enrolled in it.\n\nPlease reassign or remove the students first.`;
+                alert(message);
+                return;
+            }
+            
+            if (confirm(message + '\n\nThis action cannot be undone.')) {
+                // Show loading state
+                this.disabled = true;
+                this.innerHTML = `
+                    <svg class="animate-spin w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-1.5" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="hidden sm:inline">Deleting...</span>
+                `;
+                form.submit();
+            }
+        });
+    });
+
     // Auto-focus on name field
     const nameField = document.getElementById('name');
     if (nameField) {
@@ -712,7 +799,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Validate required fields
             const requiredFields = [
                 { id: 'name', message: 'Course name is required' },
-                { id: 'price', message: 'Price is required' },
+
                 { id: 'duration', message: 'Duration is required' }
             ];
             
@@ -727,19 +814,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             });
-            
-            // Validate price format
-            if (priceField && priceField.value) {
-                const priceValue = parseFloat(priceField.value);
-                if (isNaN(priceValue) || priceValue < 0) {
-                    e.preventDefault();
-                    showFieldError(priceField, 'Please enter a valid price');
-                    if (!hasError) {
-                        priceField.focus();
-                        hasError = true;
-                    }
-                }
-            }
             
             if (hasError) {
                 return false;

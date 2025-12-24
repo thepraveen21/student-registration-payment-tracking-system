@@ -128,12 +128,10 @@
                         <div>
                             <label for="student_phone" class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
                                 Student Phone
-                                <span class="text-red-500">*</span>
                             </label>
                             <input type="text" name="student_phone" id="student_phone" value="<?php echo e(old('student_phone')); ?>" 
                                    class="block w-full px-3 py-2 md:py-2.5 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-sm md:text-base"
-                                   placeholder="Enter student phone number"
-                                   required>
+                                   placeholder="Enter student phone number">
                         </div>
                         
                         <!-- Parent Phone -->

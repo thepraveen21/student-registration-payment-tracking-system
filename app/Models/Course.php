@@ -12,8 +12,7 @@ class Course extends Model
     protected $fillable = [
         'name',
         'description',
-        'duration',
-        'fee'
+        'duration'
     ];
 
     public function students()

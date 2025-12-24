@@ -22,7 +22,8 @@ class CourseController extends Controller
      */
     public function create()
     {
-        return view('courses.create');
+        $courses = Course::withCount('students')->latest()->get();
+        return view('courses.create', compact('courses'));
     }
 
     /**
@@ -33,13 +34,12 @@ class CourseController extends Controller
         $request->validate([
             'name' => 'required|string|max:255|unique:courses,name',
             'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
             'duration' => 'required|string|max:255',
         ]);
 
-        Course::create($request->all());
+        Course::create($request->only(['name', 'description', 'duration']));
 
-        return redirect()->route('reception.dashboard')->with('success', 'Course created successfully.');
+        return redirect()->back()->with('success', 'Course created successfully!');
     }
 
     /**
@@ -63,6 +63,20 @@ class CourseController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $course = Course::findOrFail($id);
+            
+            // Check if course has students
+            if ($course->students()->count() > 0) {
+                return redirect()->back()->with('error', 'Cannot delete course. It has ' . $course->students()->count() . ' student(s) enrolled in it.');
+            }
+            
+            $courseName = $course->name;
+            $course->delete();
+            
+            return redirect()->back()->with('success', 'Course "' . $courseName . '" deleted successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to delete course: ' . $e->getMessage());
+        }
     }
 }

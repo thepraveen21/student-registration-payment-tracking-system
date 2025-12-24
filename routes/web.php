@@ -200,9 +200,13 @@ Route::middleware(['auth'])->group(function () {
         ->name('centers.create');
     Route::post('/centers', [App\Http\Controllers\CenterController::class, 'store'])
         ->name('centers.store');
+    Route::delete('/centers/{id}', [App\Http\Controllers\CenterController::class, 'destroy'])
+        ->name('centers.destroy');
 
     Route::get('/courses/create', [CourseController::class, 'create'])
         ->name('courses.create');
     Route::post('/courses', [CourseController::class, 'store'])
         ->name('courses.store');
+    Route::delete('/courses/{id}', [CourseController::class, 'destroy'])
+        ->name('courses.destroy');
 });

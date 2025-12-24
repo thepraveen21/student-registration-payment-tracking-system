@@ -219,6 +219,104 @@
             </form>
         </div>
     </div>
+
+    <!-- Centers List Section -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mt-6">
+        <div class="px-3 md:px-4 lg:px-6 py-3 md:py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <svg class="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-gray-600 mr-2 md:mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    <div>
+                        <h2 class="text-sm md:text-base lg:text-lg font-semibold text-gray-900">All Centers</h2>
+                        <p class="text-xs md:text-sm text-gray-600 mt-0.5">Manage existing training centers</p>
+                    </div>
+                </div>
+                <span class="px-2 md:px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs md:text-sm font-semibold">
+                    {{ $centers->count() }} {{ $centers->count() === 1 ? 'Center' : 'Centers' }}
+                </span>
+            </div>
+        </div>
+        
+        <div class="p-3 md:p-4 lg:p-6">
+            @if($centers->isEmpty())
+                <div class="text-center py-8 md:py-12">
+                    <svg class="mx-auto h-12 w-12 md:h-16 md:w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    <h3 class="mt-2 text-sm md:text-base font-semibold text-gray-900">No centers yet</h3>
+                    <p class="mt-1 text-xs md:text-sm text-gray-500">Get started by creating a new center above.</p>
+                </div>
+            @else
+                <div class="space-y-2 md:space-y-3">
+                    @foreach($centers as $center)
+                        <div class="flex items-center justify-between p-3 md:p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow duration-200 bg-white hover:bg-gray-50">
+                            <div class="flex-1 min-w-0 mr-3">
+                                <div class="flex items-center space-x-2 md:space-x-3">
+                                    <div class="flex-shrink-0">
+                                        <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                                            <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h3 class="text-sm md:text-base font-semibold text-gray-900 truncate">{{ $center->name }}</h3>
+                                        @if($center->location)
+                                            <div class="flex items-center text-xs md:text-sm text-gray-600 mt-0.5">
+                                                <svg class="w-3 h-3 md:w-4 md:h-4 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                </svg>
+                                                <span class="truncate">{{ $center->location }}</span>
+                                            </div>
+                                        @endif
+                                        <div class="flex items-center text-xs text-gray-500 mt-1">
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                                            </svg>
+                                            {{ $center->students_count ?? $center->students()->count() }} students
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <form action="{{ route('centers.destroy', $center->id) }}" method="POST" class="delete-center-form inline-block" data-center-name="{{ $center->name }}" data-student-count="{{ $center->students()->count() }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" 
+                                            class="delete-center-btn inline-flex items-center px-2 md:px-3 py-1.5 md:py-2 bg-red-600 hover:bg-red-700 text-white text-xs md:text-sm font-medium rounded-lg shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200"
+                                            title="Delete center">
+                                        <svg class="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                        <span class="hidden sm:inline">Delete</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- Error Message Alert -->
+    @if (session('error'))
+    <div class="mt-4 md:mt-6 p-3 md:p-4 bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-lg shadow-sm" role="alert">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-4 w-4 md:h-5 md:w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div class="ml-2 md:ml-3">
+                <p class="text-xs md:text-sm font-medium text-red-800">{{ session('error') }}</p>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>
 
 <style>
@@ -437,6 +535,38 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Delete center confirmation
+    const deleteBtns = document.querySelectorAll('.delete-center-btn');
+    deleteBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = this.closest('.delete-center-form');
+            const centerName = form.dataset.centerName;
+            const studentCount = parseInt(form.dataset.studentCount);
+            
+            let message = `Are you sure you want to delete "${centerName}"?`;
+            
+            if (studentCount > 0) {
+                message = `Cannot delete "${centerName}" because it has ${studentCount} student(s) assigned to it.\n\nPlease reassign or remove the students first.`;
+                alert(message);
+                return;
+            }
+            
+            if (confirm(message + '\n\nThis action cannot be undone.')) {
+                // Show loading state
+                this.disabled = true;
+                this.innerHTML = `
+                    <svg class="animate-spin w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-1.5" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="hidden sm:inline">Deleting...</span>
+                `;
+                form.submit();
+            }
+        });
+    });
+
     // Auto-focus on name field
     const nameField = document.getElementById('name');
     if (nameField) {
