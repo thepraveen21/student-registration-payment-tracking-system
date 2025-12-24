@@ -1,19 +1,27 @@
 # Email Payment Reminder Setup Guide
 
 ## Overview
-This system automatically checks for students who haven't paid within 3 weeks of registration and sends them email reminders.
+This system automatically tracks monthly payments for students and sends email reminders during week 3 of each payment month if payment has not been received.
 
 ## How It Works
 
-1. **Daily Check**: Every day at 9:00 AM, the system checks for students who:
-   - Registered 3+ weeks ago (21 days or more)
-   - Have not made any monthly payments
-   - Have an active status
+1. **Monthly Cycle System**: 
+   - Each month = 4 weeks (28 days)
+   - Students are tracked for 4 months (duration of course)
+   - Week 3 of each month = reminder period (days 14-20 of each 28-day cycle)
 
-2. **Email Sent**: An automated email reminder is sent to their Gmail address with:
-   - Days overdue
-   - Registration details
-   - Course information
+2. **Daily Check**: Every day at 9:00 AM (Asia/Colombo timezone), the system:
+   - Checks all active students
+   - Calculates which month of their course they're in (1-4)
+   - Determines if they're in week 3 of that month
+   - Checks if payment for current month exists in `monthly_payments` table
+   - Sends reminder only if in week 3 AND payment is missing
+
+3. **Email Sent**: An automated reminder is sent with:
+   - Current month number (1-4)
+   - Days into week 3 (1-7)
+   - Student and course details
+   - Registration date
    - Payment instructions
 
 ## Setup Instructions
@@ -149,16 +157,41 @@ $schedule->command('payments:check-overdue')->twiceDaily(9, 17) // 9 AM and 5 PM
 $schedule->command('payments:check-overdue')->weekly() // Once per week
 ```
 
-### Change 3-Week Period
-Edit `app/Console/Commands/CheckOverduePayments.php`, line 23:
-```php
-// Current: 3 weeks
-$threeWeeksAgo = Carbon::now()->subWeeks(3)->startOfDay();
+### Change Monthly Cycle Settings
+Edit `app/Console/Commands/CheckOverduePayments.php`:
 
-// Change to different periods:
-$threeWeeksAgo = Carbon::now()->subWeeks(2)->startOfDay(); // 2 weeks
-$threeWeeksAgo = Carbon::now()->subDays(30)->startOfDay(); // 30 days
-$threeWeeksAgo = Carbon::now()->subMonth()->startOfDay(); // 1 month
+**Change month duration** (line 40):
+```php
+// Current: 4 weeks = 1 month (28 days)
+$currentMonthNumber = floor($daysSinceRegistration / 28) + 1;
+
+// Change to calendar month (30 days):
+$currentMonthNumber = floor($daysSinceRegistration / 30) + 1;
+```
+
+**Change reminder week** (line 51):
+```php
+// Current: Week 3 = days 14-20
+$isWeek3 = ($dayInCurrentMonth >= 14 && $dayInCurrentMonth <= 20);
+
+// Change to Week 2 = days 7-13:
+$isWeek2 = ($dayInCurrentMonth >= 7 && $dayInCurrentMonth <= 13);
+
+// Change to last week = days 21-27:
+$isWeek4 = ($dayInCurrentMonth >= 21 && $dayInCurrentMonth <= 27);
+```
+
+**Change course duration** (line 44):
+```php
+// Current: 4 months
+if ($currentMonthNumber > 4) {
+    continue;
+}
+
+// Change to 6 months:
+if ($currentMonthNumber > 6) {
+    continue;
+}
 ```
 
 ### Customize Email Template
@@ -204,12 +237,30 @@ Check if there are students who meet the criteria:
 php artisan tinker
 ```
 ```php
-$threeWeeksAgo = \Carbon\Carbon::now()->subWeeks(3)->startOfDay();
-$students = \App\Models\Student::where('status', 'active')
-    ->where('created_at', '<=', $threeWeeksAgo)
-    ->whereDoesntHave('monthlyPayments')
-    ->count();
-echo "Found {$students} overdue students";
+use Carbon\Carbon;
+use App\Models\Student;
+
+$today = Carbon::now();
+$activeStudents = Student::where('status', 'active')
+    ->with(['monthlyPayments'])
+    ->get();
+
+$inWeek3 = 0;
+foreach ($activeStudents as $student) {
+    $daysSinceRegistration = Carbon::parse($student->created_at)->diffInDays($today);
+    $currentMonth = floor($daysSinceRegistration / 28) + 1;
+    $dayInMonth = $daysSinceRegistration % 28;
+    $isWeek3 = ($dayInMonth >= 14 && $dayInMonth <= 20);
+    
+    if ($currentMonth <= 4 && $isWeek3) {
+        $hasPayment = $student->monthlyPayments()->where('month_number', $currentMonth)->exists();
+        if (!$hasPayment) {
+            echo "{$student->first_name} {$student->last_name} - Month {$currentMonth}, Day {$dayInMonth}\n";
+            $inWeek3++;
+        }
+    }
+}
+echo "\nTotal students in week 3 without payment: {$inWeek3}\n";
 ```
 
 ### Schedule Not Running?
@@ -259,13 +310,21 @@ echo "Found {$students} overdue students";
    ```
 
 4. Update command to use queue:
-   Edit `CheckOverduePayments.php`, change:
+   Edit `CheckOverduePayments.php` (around line 75), change:
    ```php
-   Mail::to($student->email)->send(new PaymentOverdueMail($student, $daysOverdue));
+   Mail::to($student->email)->send(new PaymentOverdueMail(
+       $student, 
+       $daysIntoWeek3,
+       $currentMonthNumber
+   ));
    ```
    To:
    ```php
-   Mail::to($student->email)->queue(new PaymentOverdueMail($student, $daysOverdue));
+   Mail::to($student->email)->queue(new PaymentOverdueMail(
+       $student, 
+       $daysIntoWeek3,
+       $currentMonthNumber
+   ));
    ```
 
 ## Support

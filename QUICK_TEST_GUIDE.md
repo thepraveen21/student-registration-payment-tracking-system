@@ -32,12 +32,12 @@ Mail::raw('Test from Student System', function($msg) {
 php artisan payments:check-overdue
 ```
 
-## 🧪 Create Test Student (Overdue)
+## 🧪 Create Test Student (Will Receive Reminder)
 
 Run in `php artisan tinker`:
 
 ```php
-// Create a student who registered 4 weeks ago (overdue by 1 week)
+// Create a student in week 3 of month 1 (day 16 = 2 weeks + 2 days ago)
 $student = \App\Models\Student::create([
     'first_name' => 'Test',
     'last_name' => 'Student',
@@ -49,13 +49,34 @@ $student = \App\Models\Student::create([
     'center_id' => 1,  // Make sure center ID 1 exists
     'status' => 'active',
     'registration_number' => 'TEST-' . time(),
-    'created_at' => now()->subWeeks(4),  // 4 weeks ago = overdue!
+    'created_at' => now()->subDays(16),  // 16 days ago = Month 1, Week 3, Day 3
     'updated_at' => now()
 ]);
 
 echo "Created test student ID: {$student->id}\n";
 echo "Email: {$student->email}\n";
 echo "Registered: {$student->created_at->format('Y-m-d')}\n";
+echo "Days since registration: 16 (Month 1, Week 3)\n";
+echo "Should receive reminder: YES (no payment for month 1)\n";
+```
+
+**Alternative - Test Month 2 reminder:**
+```php
+// Student in month 2, week 3 (around 6 weeks ago)
+$student2 = \App\Models\Student::create([
+    'first_name' => 'Test2',
+    'last_name' => 'Student',
+    'email' => 'your-test-email@gmail.com',
+    'student_phone' => '0771234567',
+    'parent_phone' => '0771234567',
+    'date_of_birth' => '2000-01-01',
+    'course_id' => 1,
+    'center_id' => 1,
+    'status' => 'active',
+    'registration_number' => 'TEST2-' . time(),
+    'created_at' => now()->subDays(44),  // 44 days = Month 2, Week 3, Day 2
+    'updated_at' => now()
+]);
 ```
 
 Now run:
@@ -63,30 +84,54 @@ Now run:
 php artisan payments:check-overdue
 ```
 
-You should receive an email at your test address!
+You should receive an email showing the month number and days into week 3!
 
-## 📊 Check Current Overdue Students
+## 📊 Check Who Will Get Reminders Today
 
-```php
+```bash
 php artisan tinker
 ```
 
 ```php
-// See all students 3+ weeks old without payment
-$threeWeeksAgo = \Carbon\Carbon::now()->subWeeks(3)->startOfDay();
-$overdue = \App\Models\Student::where('status', 'active')
-    ->where('created_at', '<=', $threeWeeksAgo)
-    ->whereDoesntHave('monthlyPayments')
-    ->with(['course', 'center'])
+use Carbon\Carbon;
+use App\Models\Student;
+
+$today = Carbon::now();
+$activeStudents = Student::where('status', 'active')
+    ->with(['course', 'center', 'monthlyPayments'])
     ->get();
 
-echo "Found {$overdue->count()} overdue students:\n\n";
+$willGetReminder = [];
 
-foreach($overdue as $s) {
-    $days = \Carbon\Carbon::now()->diffInDays($s->created_at->addWeeks(3), false) * -1;
-    echo "- {$s->first_name} {$s->last_name} ({$s->email})\n";
-    echo "  Registered: {$s->created_at->format('Y-m-d')} ({$days} days overdue)\n";
-    echo "  Course: " . ($s->course->name ?? 'N/A') . "\n\n";
+foreach ($activeStudents as $student) {
+    $daysSinceReg = Carbon::parse($student->created_at)->diffInDays($today);
+    $currentMonth = floor($daysSinceReg / 28) + 1;
+    $dayInMonth = $daysSinceReg % 28;
+    $isWeek3 = ($dayInMonth >= 14 && $dayInMonth <= 20);
+    
+    if ($currentMonth <= 4 && $isWeek3) {
+        $hasPayment = $student->monthlyPayments->where('month_number', $currentMonth)->isNotEmpty();
+        if (!$hasPayment) {
+            $daysIntoWeek3 = $dayInMonth - 14 + 1;
+            $willGetReminder[] = [
+                'name' => "{$student->first_name} {$student->last_name}",
+                'email' => $student->email,
+                'registered' => $student->created_at->format('Y-m-d'),
+                'month' => $currentMonth,
+                'week3_day' => $daysIntoWeek3,
+                'course' => $student->course->name ?? 'N/A'
+            ];
+        }
+    }
+}
+
+echo "Students who will receive reminders today: " . count($willGetReminder) . "\n\n";
+
+foreach ($willGetReminder as $s) {
+    echo "- {$s['name']} ({$s['email']})\n";
+    echo "  Registered: {$s['registered']}\n";
+    echo "  Current: Month {$s['month']}, Week 3, Day {$s['week3_day']}\n";
+    echo "  Course: {$s['course']}\n\n";
 }
 ```
 
@@ -137,11 +182,15 @@ php artisan cache:clear
 Students will receive an email with:
 - **Subject**: "Urgent: Class Fee Payment Reminder - Action Required"
 - **Content**:
-  - Days overdue (highlighted in red)
-  - Registration details
+  - Student name and registration number
+  - Current month number (1-4)
+  - Days into week 3 (payment reminder period)
+  - Registration date
   - Course and center information
-  - Payment methods
-  - Contact button
+  - Payment instructions
+  - Contact information
+- **Email Template**: `resources/views/emails/payment_overdue.blade.php`
+- **Mailable Class**: `App\Mail\PaymentOverdueMail`
 
 ## 🚀 Going Live
 
